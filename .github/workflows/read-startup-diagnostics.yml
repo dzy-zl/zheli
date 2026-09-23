@@ -1,0 +1,29 @@
+name: Inspect startup diagnostics
+on:
+  push:
+    branches: ['diagnostics/startup-35930853093']
+permissions:
+  actions: read
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Zheli-Windows-Diagnostics
+          run-id: 35930853093
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: diagnostics
+      - name: Show synthetic runner startup events
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root = Path('diagnostics')
+          for p in sorted(root.rglob('*')):
+              if p.is_file() and (p.name.startswith('startup-') or p.name == 'installer-smoke.txt'):
+                  print(p.name)
+                  print(p.read_text(encoding='utf-8-sig'))
+          PY
