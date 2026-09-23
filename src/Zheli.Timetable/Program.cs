@@ -12,9 +12,9 @@ public static class Program
         Application.Start(_=>{SynchronizationContext.SetSynchronizationContext(new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread()));new TimetableApp();});
     }
 }
-public sealed class TimetableApp:Application
+public sealed partial class TimetableApp:Application
 {
     private Window? _window;
-    public TimetableApp(){Zheli.DesignSystem.StartupDiagnostics.Attach(this);Resources.MergedDictionaries.Add(new XamlControlsResources());}
+    public TimetableApp(){Zheli.DesignSystem.StartupDiagnostics.Attach(this);InitializeComponent();}
     protected override void OnLaunched(LaunchActivatedEventArgs args){_window=new TimetableWindow();Zheli.DesignSystem.AppActivation.Bind(_window);_window.Activate();}
 }

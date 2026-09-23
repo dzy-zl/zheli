@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup Condition="'$(UseWinUI)' == 'true' and '$(OutputType)' == 'WinExe'">
+    <!-- Keep our single-instance entry point while generating the XAML application metadata. -->
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+  </PropertyGroup>
+</Project>

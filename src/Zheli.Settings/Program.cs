@@ -15,9 +15,9 @@ public static class Program
         Application.Start(_=>{Zheli.DesignSystem.StartupDiagnostics.Trace("XAML callback entered");SynchronizationContext.SetSynchronizationContext(new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread()));new SettingsApp();});
     }
 }
-public sealed class SettingsApp:Application
+public sealed partial class SettingsApp:Application
 {
     private Window? _window;
-    public SettingsApp(){Zheli.DesignSystem.StartupDiagnostics.Attach(this);Resources.MergedDictionaries.Add(new XamlControlsResources());Zheli.DesignSystem.StartupDiagnostics.Trace("Resources ready");}
+    public SettingsApp(){Zheli.DesignSystem.StartupDiagnostics.Attach(this);InitializeComponent();Zheli.DesignSystem.StartupDiagnostics.Trace("Resources ready");}
     protected override void OnLaunched(LaunchActivatedEventArgs args){Zheli.DesignSystem.StartupDiagnostics.Trace("Creating window");_window=new SettingsWindow();Zheli.DesignSystem.StartupDiagnostics.Trace("Window created");Zheli.DesignSystem.AppActivation.Bind(_window);_window.Activate();}
 }

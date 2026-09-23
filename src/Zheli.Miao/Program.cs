@@ -12,9 +12,9 @@ public static class Program
         Application.Start(_=>{SynchronizationContext.SetSynchronizationContext(new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread()));new MiaoApp();});
     }
 }
-public sealed class MiaoApp:Application
+public sealed partial class MiaoApp:Application
 {
     private Window? _window;
-    public MiaoApp(){Zheli.DesignSystem.StartupDiagnostics.Attach(this);Resources.MergedDictionaries.Add(new XamlControlsResources());}
+    public MiaoApp(){Zheli.DesignSystem.StartupDiagnostics.Attach(this);InitializeComponent();}
     protected override void OnLaunched(LaunchActivatedEventArgs args){var window=new MiaoWindow();_window=window;Zheli.DesignSystem.AppActivation.Bind(window,window.AcceptContext);_window.Activate();}
 }
