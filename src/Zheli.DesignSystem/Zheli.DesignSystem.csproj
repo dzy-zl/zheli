@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0-windows10.0.19041.0</TargetFramework><UseWinUI>true</UseWinUI><WindowsPackageType>None</WindowsPackageType><WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained></PropertyGroup>
+  <ItemGroup><PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1"/><ProjectReference Include="../Zheli.Platform/Zheli.Platform.csproj"/></ItemGroup>
+</Project>

@@ -1,0 +1,15 @@
+2026-09-23 | 0.2.2 | Linux managed compilation only; Windows native resources disabled
+  Determining projects to restore...
+  Restored /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.CoreHost/Zheli.CoreHost.csproj (in 195 ms).
+  4 of 5 projects are up-to-date for restore.
+  Zheli.Domain -> /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.Domain/bin/Debug/net10.0/Zheli.Domain.dll
+  Zheli.Contracts -> /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.Contracts/bin/Debug/net10.0/Zheli.Contracts.dll
+  Zheli.Bridge -> /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.Bridge/bin/Debug/net10.0/Zheli.Bridge.dll
+  Zheli.Storage -> /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.Storage/bin/Debug/net10.0/Zheli.Storage.dll
+  Zheli.CoreHost -> /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.CoreHost/bin/Debug/net10.0/win-x64/Zheli.CoreHost.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:04.12

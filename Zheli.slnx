@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Zheli.Bridge/Zheli.Bridge.csproj" />
+    <Project Path="src/Zheli.Contracts/Zheli.Contracts.csproj" />
+    <Project Path="src/Zheli.CoreHost/Zheli.CoreHost.csproj" />
+    <Project Path="src/Zheli.DesignSystem/Zheli.DesignSystem.csproj" />
+    <Project Path="src/Zheli.Domain/Zheli.Domain.csproj" />
+    <Project Path="src/Zheli.Miao/Zheli.Miao.csproj" />
+    <Project Path="src/Zheli.PetHost/Zheli.PetHost.csproj" />
+    <Project Path="src/Zheli.Platform/Zheli.Platform.csproj" />
+    <Project Path="src/Zheli.Settings/Zheli.Settings.csproj" />
+    <Project Path="src/Zheli.Storage/Zheli.Storage.csproj" />
+    <Project Path="src/Zheli.Timetable.Host/Zheli.Timetable.Host.csproj" />
+    <Project Path="src/Zheli.Timetable/Zheli.Timetable.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Zheli.DeepSeek.Tests/Zheli.DeepSeek.Tests.csproj" />
+    <Project Path="tests/Zheli.Tests/Zheli.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,18 @@
+2026-09-23 | 0.2.2 | Linux managed compilation only; Windows native resources disabled
+  Determining projects to restore...
+  Restored /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.Contracts/Zheli.Contracts.csproj (in 160 ms).
+  Restored /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.Bridge/Zheli.Bridge.csproj (in 161 ms).
+  Restored /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.Domain/Zheli.Domain.csproj (in 148 ms).
+  Restored /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.PetHost/Zheli.PetHost.csproj (in 181 ms).
+  Restored /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.Storage/Zheli.Storage.csproj (in 181 ms).
+  Zheli.Domain -> /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.Domain/bin/Debug/net10.0/Zheli.Domain.dll
+  Zheli.Contracts -> /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.Contracts/bin/Debug/net10.0/Zheli.Contracts.dll
+  Zheli.Bridge -> /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.Bridge/bin/Debug/net10.0/Zheli.Bridge.dll
+  Zheli.Storage -> /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.Storage/bin/Debug/net10.0/Zheli.Storage.dll
+  Zheli.PetHost -> /workspace/scratch/10d18f3e3441/development/zheli-native/src/Zheli.PetHost/bin/Debug/net10.0-windows/win-x64/Zheli.PetHost.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:12.62

@@ -1,0 +1,22 @@
+PASS PowerShell parser: build-installers.ps1
+PASS PowerShell parser: build-windows.ps1
+PASS PowerShell parser: collect-notices.ps1
+PASS PowerShell parser: install-inno-compiler.ps1
+PASS PowerShell parser: install-user.ps1
+PASS PowerShell parser: test-deepseek.ps1
+PASS PowerShell parser: test-installers-windows.ps1
+PASS PowerShell parser: Test-PublishLayout.ps1
+PASS PowerShell parser: uninstall-user.ps1
+PASS PowerShell parser: Packaging.Tests.ps1
+Publish layout validated. This does not replace Windows runtime testing.
+PASS complete synthetic publish layout accepted
+PASS missing native resource rejected
+PASS non-Windows entry point rejected
+PASS modified binary rejected
+PASS unlisted extra file rejected
+PASS duplicate manifest entry rejected
+PASS parent traversal rejected
+PASS absolute manifest path rejected
+PASS alternate path spelling cannot conceal missing file
+PASS symlink payload rejected
+RESULT: 20 passed, 0 failed; script and synthetic packaging checks only

@@ -1,0 +1,5 @@
+PASS live model discovery; count=2
+Selected model: deepseek-flash
+PASS live synthetic timetable question (answer matched; body omitted)
+PASS live synthetic file citation (answer matched; body omitted)
+RESULT: live checks passed; no personal files or real timetable read

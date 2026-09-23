@@ -1,0 +1,53 @@
+name: Windows test installers
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, 'build/**']
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: windows-installers-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.100'
+      - name: Core tests and full native Windows publish
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File ./tests/Packaging.Tests.ps1
+          if ($LASTEXITCODE -ne 0) { throw 'Packaging checks failed.' }
+          ./scripts/build-windows.ps1
+      - name: Install checksum-pinned installer compiler
+        shell: pwsh
+        run: ./scripts/install-inno-compiler.ps1
+      - name: Build three independent installers
+        shell: pwsh
+        run: ./scripts/build-installers.ps1
+      - name: Verify installation, startup, coexistence and data preservation
+        shell: pwsh
+        run: |
+          $directory = @(Get-ChildItem artifacts -Directory -Filter 'installers-*')
+          if ($directory.Count -ne 1) { throw 'Expected exactly one installer build.' }
+          ./scripts/test-installers-windows.ps1 -InstallerDirectory $directory[0].FullName
+      - name: Upload tested unsigned installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: Zheli-Windows-x64-Test-Installers
+          path: artifacts/installers-*/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload build and installer diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Zheli-Windows-Diagnostics
+          path: artifacts/logs/
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,454 @@
+{
+  "version": "0.2.3",
+  "scope": "public repository; reference images excluded",
+  "files": [
+    {
+      "Path": ".github/workflows/windows-build.yml",
+      "SHA256": "3e649d70906b98e5b3f9c9cfce68d42caecbed7e4d9f8ad702798ceb83ba88f3"
+    },
+    {
+      "Path": ".gitignore",
+      "SHA256": "29fcd0968d28779f736e4d21ac122082a20522dee2a1b8e4ef7d9c0c7d4c0b78"
+    },
+    {
+      "Path": "Directory.Build.props",
+      "SHA256": "7b676466f791ada13c19e0591941ef6acbe47da9f593d76e7c5d8184a2caa013"
+    },
+    {
+      "Path": "NuGet.Config",
+      "SHA256": "17f8588bd0874138a10e92eb9efee6e346a173591124ab57872f019475f8f81a"
+    },
+    {
+      "Path": "README.md",
+      "SHA256": "de4e34b0b004b92152280a0ff0941472b35082efe9263109fd5418d72616d07c"
+    },
+    {
+      "Path": "Zheli.slnx",
+      "SHA256": "24e16391a6766835b7d943fe9c3f505877d88bca850e54cb30b9640fa7b82ce9"
+    },
+    {
+      "Path": "assets/README.md",
+      "SHA256": "0bdda340fa6979db7b123c7b22ce1aa5ee3d48b5e4ada95388ad62625998f489"
+    },
+    {
+      "Path": "docs/ARCHITECTURE.md",
+      "SHA256": "eb02388e9977cb0ea7f39d1d26632cbf0ac0ad732a93135eab768697c43169d6"
+    },
+    {
+      "Path": "docs/CHANGELOG.md",
+      "SHA256": "a281a83c0f4755d3cecee067534ed0c09841c4ffd8298135f8e1ce6febb87eed"
+    },
+    {
+      "Path": "docs/DEEPSEEK-TESTING.md",
+      "SHA256": "d15f1b19a8f273d3e80f86af5faddcc2507a8838969e012968fd790a3ef76bf5"
+    },
+    {
+      "Path": "docs/INSTALLER-BUILD.md",
+      "SHA256": "5774bdc7a5137f103f42f84db0a315206229866c0eed9e788cdc0f36bb0e4a5e"
+    },
+    {
+      "Path": "docs/KNOWLEDGE.md",
+      "SHA256": "19fceb4380dca181ea10ca189e7c3df23fb9df8ae9557006938496ca92a7913d"
+    },
+    {
+      "Path": "docs/PET-DESKTOP.md",
+      "SHA256": "0e6ffbce7a047de43bb0f5c607913d31f309be8d9e9a5b10fe986078d9d26eb3"
+    },
+    {
+      "Path": "docs/STATUS.md",
+      "SHA256": "92548a033668f1ed0e3dfe2e23fc62581bd8592f9afeec636d3234d01cf71124"
+    },
+    {
+      "Path": "docs/THIRD-PARTY.md",
+      "SHA256": "5812d68217b9cb4bad57b92d6b08916aaaa71e41daed674e04605e6cac5095de"
+    },
+    {
+      "Path": "docs/WINDOWS-ACCEPTANCE.md",
+      "SHA256": "2e0a9de75ce2db5a893670b0c0e0023eed11b12f60f406546f70784db70720bc"
+    },
+    {
+      "Path": "global.json",
+      "SHA256": "7fd1f7f4ffa8b0dac6a02355cdc371c1623638cfbe10559759b87403d807bf78"
+    },
+    {
+      "Path": "installer/Languages/ChineseSimplified.isl",
+      "SHA256": "fc1dbf303559cfefd47cf59eec7f1ad1c5fc6266ef8fa64569c13bc754adfeb4"
+    },
+    {
+      "Path": "installer/Zheli.iss",
+      "SHA256": "3254c2f45968a581ab833fb4bf0b3e456cfa14fd8f8c1e2cafb645bf12753256"
+    },
+    {
+      "Path": "installer/licenses/Inno-Setup-6.5.4-license.txt",
+      "SHA256": "a7f97b166be34fc8bf04e79617b9f56b2aa7903a2808f94155e449c80bdfdcc2"
+    },
+    {
+      "Path": "installer/third-party-sources.json",
+      "SHA256": "ee18cdd151cc282dbe565e4f633eed4e919cf7b1208b92c13cb2f0da4895fdcb"
+    },
+    {
+      "Path": "scripts/Test-PublishLayout.ps1",
+      "SHA256": "1d279005108b25e925249a52547ced54b8d2fe1097da7315d56351406a51f563"
+    },
+    {
+      "Path": "scripts/build-installers.ps1",
+      "SHA256": "d0cc1f5b21d6462fbcd319370c7bed5fca293c2f9c56ddf0fa585cb9302bbe6a"
+    },
+    {
+      "Path": "scripts/build-windows.ps1",
+      "SHA256": "82174c1e304f4fc38f11cc688b2033eef082d919193f40c38e1daaf2058409e8"
+    },
+    {
+      "Path": "scripts/collect-notices.ps1",
+      "SHA256": "8f6956d36d0631c310aee3f61f94c0337b7f77024b53eb25b1ec3bfbc0264ca4"
+    },
+    {
+      "Path": "scripts/install-inno-compiler.ps1",
+      "SHA256": "5e92f12f872ca4f737a77edb5b1bfcd4d5327bfce81a38809c4df73590a20c09"
+    },
+    {
+      "Path": "scripts/install-user.ps1",
+      "SHA256": "cef7f88881c2d227dae1558bad0f74ae52521186d26d690e27d21fce5836e843"
+    },
+    {
+      "Path": "scripts/test-deepseek.ps1",
+      "SHA256": "20f0dcc6539f24b16d5d004851f9a760b2265017c1146edbe79fd8ef00b16d71"
+    },
+    {
+      "Path": "scripts/test-installers-windows.ps1",
+      "SHA256": "26f9afd5b882705c3e98680f764f75f39b259a79b9ead2e8231897c5ed521fce"
+    },
+    {
+      "Path": "scripts/uninstall-user.ps1",
+      "SHA256": "016ee2b8932b129369c577abd6d91c8b72b97cfa95601ed693abb22288d28111"
+    },
+    {
+      "Path": "src/Zheli.Bridge/AppBridge.cs",
+      "SHA256": "6311169c5a74da16d3f6231c97c31e91394b3f3ee521c0dc76066005652e4156"
+    },
+    {
+      "Path": "src/Zheli.Bridge/Zheli.Bridge.csproj",
+      "SHA256": "5460e50a75fc27d5c1468e036c1635c25d973ad6ffad9f0bbddc99ecb9afce2b"
+    },
+    {
+      "Path": "src/Zheli.Bridge/packages.lock.json",
+      "SHA256": "8a48b5f778d762545601f75407d335b4731a5f8ef7e407f9fd53cb04666a228f"
+    },
+    {
+      "Path": "src/Zheli.Contracts/Protocol.cs",
+      "SHA256": "e912be3c2faf66162eb79309452a12995607830bf327ec704b8139b2958adfee"
+    },
+    {
+      "Path": "src/Zheli.Contracts/Zheli.Contracts.csproj",
+      "SHA256": "26943c4a157959c0fa5f5b37500a56176baad574af631c49429c80e423347ea5"
+    },
+    {
+      "Path": "src/Zheli.Contracts/packages.lock.json",
+      "SHA256": "d5c2fd30c37bd2e1c4f53539696b8f0fdc0b45bca9e801475fa4a1a7517086e3"
+    },
+    {
+      "Path": "src/Zheli.CoreHost/Program.cs",
+      "SHA256": "ad5caa56709ba7eb9fb47cbcbbdd9fea4f130acc6f308dc1b6791edeea17abb6"
+    },
+    {
+      "Path": "src/Zheli.CoreHost/Zheli.CoreHost.csproj",
+      "SHA256": "1756a9a93dee970a912a3b7bbe969c852dc9b3fd89343a1af5c24c12da54157e"
+    },
+    {
+      "Path": "src/Zheli.CoreHost/packages.lock.json",
+      "SHA256": "4874e1d030d3eaa67cbf19c63bfd6a24c56bffd1a2ba945206130e0971f3a0ba"
+    },
+    {
+      "Path": "src/Zheli.DesignSystem/.mono/registry/CurrentUser/software/microsoft/sqmclient/values.xml",
+      "SHA256": "c13e0aa9cabbf75048f54c43c4755b43d03580a266cbb6a93d32a50c2ef38c52"
+    },
+    {
+      "Path": "src/Zheli.DesignSystem/.mono/registry/CurrentUser/software/microsoft/visualstudio/telemetry/default/v2/values.xml",
+      "SHA256": "fa8dcbc481d690566aa8b7787dbab1179a8f4f67223b04bf5acc36a30e9ab0ed"
+    },
+    {
+      "Path": "src/Zheli.DesignSystem/.mono/registry/CurrentUser/software/microsoft/visualstudio/telemetry/values.xml",
+      "SHA256": "fa8dcbc481d690566aa8b7787dbab1179a8f4f67223b04bf5acc36a30e9ab0ed"
+    },
+    {
+      "Path": "src/Zheli.DesignSystem/AppActivation.cs",
+      "SHA256": "72827580797d3db0e06fbd85bbe20b2387f75d1484ff517397f3acf82c415f08"
+    },
+    {
+      "Path": "src/Zheli.DesignSystem/ShellWindow.cs",
+      "SHA256": "e153a4f00df2a9f6ade9722bebb6cb0a28ca735fb52cc8bb8754a20e6454b935"
+    },
+    {
+      "Path": "src/Zheli.DesignSystem/Ui.cs",
+      "SHA256": "e1ed09f82b89cd7d5b3dcdd71512cc71e2853099d3c2bcbe33dbc22b8f683358"
+    },
+    {
+      "Path": "src/Zheli.DesignSystem/Zheli.DesignSystem.csproj",
+      "SHA256": "e915e5ff20cf861f553cd2e58c8a52ed9c32e7b10bb7310c55754bbdea5a98f0"
+    },
+    {
+      "Path": "src/Zheli.DesignSystem/packages.lock.json",
+      "SHA256": "6762ce1cf02fbce3504c07a58f4ae9dc3e7a396e639df2415a84baa6ff47adb1"
+    },
+    {
+      "Path": "src/Zheli.Domain/CalendarEngine.cs",
+      "SHA256": "1e2fe1388c5a9a528d91b96f8e42531fd2623e0ec81e83194c9819aa69cafaec"
+    },
+    {
+      "Path": "src/Zheli.Domain/Commands.cs",
+      "SHA256": "a94813d199e820236c553cef4dfaf9b690ececfbbdbce51de5517278e78367e0"
+    },
+    {
+      "Path": "src/Zheli.Domain/KnowledgePolicy.cs",
+      "SHA256": "9cde6d29c391df9910608bc60d812f210bb9815efc0c7e2dd4e7281707645a54"
+    },
+    {
+      "Path": "src/Zheli.Domain/Models.cs",
+      "SHA256": "d2352400fc1ef79f434942d94aa84af53e278e340b6eddfce5a3ca28ea015fd4"
+    },
+    {
+      "Path": "src/Zheli.Domain/PetDesktop.cs",
+      "SHA256": "66ba43f1f4ecae2e48b57f109b66888055ebf388369da568ba299333dff09919"
+    },
+    {
+      "Path": "src/Zheli.Domain/PreparedChanges.cs",
+      "SHA256": "8d7ac15916ae5266ab8b127f464a055aa7d5d1cf2fdb611d062f0e4134f4d98f"
+    },
+    {
+      "Path": "src/Zheli.Domain/Zheli.Domain.csproj",
+      "SHA256": "91275edd3790c4f0cb484653195ccd8ad6af2f1a0a69b84fdb26b88c0b52407f"
+    },
+    {
+      "Path": "src/Zheli.Domain/packages.lock.json",
+      "SHA256": "c30b149eb0b6c271aabe8d79d7b0318ba25f0bbd2ebf6a08faa3b67056bce9b3"
+    },
+    {
+      "Path": "src/Zheli.Miao/Conversation.cs",
+      "SHA256": "40f0b60ee2563e237976deaace92a5e51e2072b58f442e661f1fe0cdcb812961"
+    },
+    {
+      "Path": "src/Zheli.Miao/MiaoWindow.cs",
+      "SHA256": "96af57ef6f993a23dd648f058ab885e7eeaf6cf79aeec59deed8b3ace40594b8"
+    },
+    {
+      "Path": "src/Zheli.Miao/Program.cs",
+      "SHA256": "575007c968b63f94e1366d3207777c3173e445ace2c88c6019a22d1c32e18664"
+    },
+    {
+      "Path": "src/Zheli.Miao/Zheli.Miao.csproj",
+      "SHA256": "bfbf9a4bdbd26f4c21573af08ef3392cb476efe1192bdf85cbd52b050441421e"
+    },
+    {
+      "Path": "src/Zheli.Miao/packages.lock.json",
+      "SHA256": "fef0670b010b2112fd4066741d80acad2576392ec758ec2ebf6226856d1a345f"
+    },
+    {
+      "Path": "src/Zheli.PetHost/Program.cs",
+      "SHA256": "ff0d374fc798b75f1155937d6d2af51ed0b39957aa5d3b8b87effdfc532462a5"
+    },
+    {
+      "Path": "src/Zheli.PetHost/Zheli.PetHost.csproj",
+      "SHA256": "1b6c0fcbce2e7f705a3f6eed5f87d81a13d099acd6819aa15c05eea88cdf7af5"
+    },
+    {
+      "Path": "src/Zheli.PetHost/packages.lock.json",
+      "SHA256": "f0d051ed3fb921e1ac90510c36123651caa6ffeae2c4ffc4daf67f02b5008aea"
+    },
+    {
+      "Path": "src/Zheli.Platform/CredentialVault.cs",
+      "SHA256": "c5308b1e2dc823c1f5a7ad5af30d87415ea6cb8176edd897100f5bc8b6185ea1"
+    },
+    {
+      "Path": "src/Zheli.Platform/DeepSeekClient.cs",
+      "SHA256": "979530021d6b848ef9b855e0ddb8ae6f38cb59c354f26debc28f9349c6dc7782"
+    },
+    {
+      "Path": "src/Zheli.Platform/DocumentTextExtractor.cs",
+      "SHA256": "e2560db073ae57b1cc28b61fdf5d5ab192b623ae41a945f3f47ca9e23d83780f"
+    },
+    {
+      "Path": "src/Zheli.Platform/KnowledgeIndex.cs",
+      "SHA256": "cbe5e6b1e8a360e718b9228141e0edcccef9607091a6e8ba6ce9747b6870f973"
+    },
+    {
+      "Path": "src/Zheli.Platform/LocalTextSearch.cs",
+      "SHA256": "c2369bdf00cf8ebdec52724eabe51db1106564b59c0b7c444392b25832611d89"
+    },
+    {
+      "Path": "src/Zheli.Platform/Zheli.Platform.csproj",
+      "SHA256": "c9b771423d1992d2d755ab745a38c62899c1c9187a968ed776e836e5eb47f6e7"
+    },
+    {
+      "Path": "src/Zheli.Platform/packages.lock.json",
+      "SHA256": "dcd9584fe342433320b6dc3f58941c8f2110947e6f3f8c6763a2bbaca6876034"
+    },
+    {
+      "Path": "src/Zheli.Settings/Program.cs",
+      "SHA256": "14a819835ed8d1a3778dd525dbb79128814539dc2bca196e88b647dae34f96e5"
+    },
+    {
+      "Path": "src/Zheli.Settings/SettingsWindow.cs",
+      "SHA256": "9e798e3a82b5f7c7c6eae42256d1de4d72615695dea4dc78791158be823dfaa5"
+    },
+    {
+      "Path": "src/Zheli.Settings/Zheli.Settings.csproj",
+      "SHA256": "cde0b21531f84a99c101206d6063137bd35ee088bc5a102cc7e241bb34f56c30"
+    },
+    {
+      "Path": "src/Zheli.Settings/packages.lock.json",
+      "SHA256": "fef0670b010b2112fd4066741d80acad2576392ec758ec2ebf6226856d1a345f"
+    },
+    {
+      "Path": "src/Zheli.Storage/DocumentStore.cs",
+      "SHA256": "648f73ef15a601e3480c86028216cc2e0f7cbeeb3e10746eed290eab3a1ce5b9"
+    },
+    {
+      "Path": "src/Zheli.Storage/DraftStore.cs",
+      "SHA256": "e6c47345e7e4f9cbe7f7fe955c60e1cd4627c7469680e9f1246bb645879048c9"
+    },
+    {
+      "Path": "src/Zheli.Storage/PortableBackup.cs",
+      "SHA256": "51f9d4e15e4a741b925627fceaf2da1465c36c8d29bd5e4c25ef755806ec83d2"
+    },
+    {
+      "Path": "src/Zheli.Storage/Zheli.Storage.csproj",
+      "SHA256": "73ab64a267c436d28cc09571c6d8c73d2c5a949f51b0a77e3532a68c05f986d8"
+    },
+    {
+      "Path": "src/Zheli.Storage/packages.lock.json",
+      "SHA256": "9f2fd13acbf972b5b9212569793a1c416f9c2ecf76f35806eb321485e19d5e96"
+    },
+    {
+      "Path": "src/Zheli.Timetable/Program.cs",
+      "SHA256": "caa3e4d3ddbc76f5f5f1e632d2d306e7a479e68dd3829009c9d9a6badcc1928c"
+    },
+    {
+      "Path": "src/Zheli.Timetable/TimetableWindow.cs",
+      "SHA256": "5461255097d9c118e4e844d9bb03068f42d7fceab33663ebd778b4037fff2589"
+    },
+    {
+      "Path": "src/Zheli.Timetable/Zheli.Timetable.csproj",
+      "SHA256": "bfbf9a4bdbd26f4c21573af08ef3392cb476efe1192bdf85cbd52b050441421e"
+    },
+    {
+      "Path": "src/Zheli.Timetable/packages.lock.json",
+      "SHA256": "fef0670b010b2112fd4066741d80acad2576392ec758ec2ebf6226856d1a345f"
+    },
+    {
+      "Path": "src/Zheli.Timetable.Host/Program.cs",
+      "SHA256": "4dbf055617981f1f4bf3a4859e7f39568febcab97b174bf623bfc3c100b8d073"
+    },
+    {
+      "Path": "src/Zheli.Timetable.Host/Zheli.Timetable.Host.csproj",
+      "SHA256": "1756a9a93dee970a912a3b7bbe969c852dc9b3fd89343a1af5c24c12da54157e"
+    },
+    {
+      "Path": "src/Zheli.Timetable.Host/packages.lock.json",
+      "SHA256": "4874e1d030d3eaa67cbf19c63bfd6a24c56bffd1a2ba945206130e0971f3a0ba"
+    },
+    {
+      "Path": "src/app.manifest",
+      "SHA256": "64c14ede9450113b9e7c5772ca89e0467451c832ff976c86efc8841f865dfc14"
+    },
+    {
+      "Path": "tests/Packaging.Tests.ps1",
+      "SHA256": "5749204cdaef846dfcc5d60f8c0bec2ffd3207527f32f2e722f7e188ef17b9c4"
+    },
+    {
+      "Path": "tests/Zheli.DeepSeek.Tests/Program.cs",
+      "SHA256": "f15ce7d40fd475a326216170270f06c811bc73d384f10699e917e35ee2d7e02b"
+    },
+    {
+      "Path": "tests/Zheli.DeepSeek.Tests/Zheli.DeepSeek.Tests.csproj",
+      "SHA256": "ef62f3721548647a71e8b5178ae2870cbe336ce0dbfbf468cd1e4f5b1af5c812"
+    },
+    {
+      "Path": "tests/Zheli.DeepSeek.Tests/packages.lock.json",
+      "SHA256": "a29c6aa8cfb81874ff8bb78dc369d7416f28c9b8cc47e99592bfc019b20c41eb"
+    },
+    {
+      "Path": "tests/Zheli.Tests/KnowledgeTests.cs",
+      "SHA256": "cb73ba59db716267269282a456b0a9fc150805fea39fdf5309785b0dda60c29f"
+    },
+    {
+      "Path": "tests/Zheli.Tests/PetDesktopTests.cs",
+      "SHA256": "7e18a14262c08ec80211c020c23f70c411549c08899f842cad74d735d39e218f"
+    },
+    {
+      "Path": "tests/Zheli.Tests/Program.cs",
+      "SHA256": "9372e861e2ed241c02648670400299ec70d7e9f2a61c5f6e76df342b8874403b"
+    },
+    {
+      "Path": "tests/Zheli.Tests/Zheli.Tests.csproj",
+      "SHA256": "83745574f91bc92b702d274d7aee2b56c4450f2a5b604adcf208fd9cc0cd8a3d"
+    },
+    {
+      "Path": "tests/Zheli.Tests/packages.lock.json",
+      "SHA256": "0f196771b38dcf457c704885914685bd9d8f7bfcd6c5d313071a4ae26c234861"
+    },
+    {
+      "Path": "verification/README.md",
+      "SHA256": "fff816768bc0f8f11bc5e1fc1a98b1225c27c09cc0d97bbbeaeb89c280fbf57d"
+    },
+    {
+      "Path": "verification/core-tests.txt",
+      "SHA256": "c3533e258cec8350a5cc1a8caead1630a826eda4874d7507f455f5949c5fd7a0"
+    },
+    {
+      "Path": "verification/deepseek-live.txt",
+      "SHA256": "f07ba77ca2238d33458f50e2aceb789584f745060f028ec21128f69f6110dc8e"
+    },
+    {
+      "Path": "verification/deepseek-offline.txt",
+      "SHA256": "e2bcfd065644526f5e53a41d5b4973dee1b950a79b688500f58f0785fda1d6d4"
+    },
+    {
+      "Path": "verification/dependency-audit.txt",
+      "SHA256": "44649d94a0b8cddc140c1a4e6cf554236afd95d716b592e917cf507e149ee84b"
+    },
+    {
+      "Path": "verification/dependency-licenses.json",
+      "SHA256": "8032ecfa5bdaac9a205bbfd604da9f2d4ae5d5a1137fdba7d49d6e15e0f985f4"
+    },
+    {
+      "Path": "verification/installer-preparation.json",
+      "SHA256": "0c4964c20ec4977be43dc4149a72ee3823d7247758200a4d577b9eca435ea339"
+    },
+    {
+      "Path": "verification/managed-Zheli.CoreHost.txt",
+      "SHA256": "a5d591f63982f52148cfcf85ed98f382994bd048944145aa7ff5fcf097972594"
+    },
+    {
+      "Path": "verification/managed-Zheli.Miao.txt",
+      "SHA256": "547f701ac8464307fa5301eb38e7aa4bb32161c9e4f8d2b40c8c1f7fc5b953ea"
+    },
+    {
+      "Path": "verification/managed-Zheli.PetHost.txt",
+      "SHA256": "7bff29ff96ed1dc4be49d5df1b04c7ea965a28b0d16f1c0b2dd31380675cd445"
+    },
+    {
+      "Path": "verification/managed-Zheli.Settings.txt",
+      "SHA256": "0c53d833a13f6e0c0b6fc828afe08f985605763664ae79cc1ebcfd7a8697fbae"
+    },
+    {
+      "Path": "verification/managed-Zheli.Timetable.Host.txt",
+      "SHA256": "cad4b9a603d1ef5ca25676165bdd58163f3b5f4a34b3c0f472070c562e4b0cf7"
+    },
+    {
+      "Path": "verification/managed-Zheli.Timetable.txt",
+      "SHA256": "4d5464568cca69e1dcaa52662692d19db18403d749648f095d7911ee9a709d54"
+    },
+    {
+      "Path": "verification/managed-summary.json",
+      "SHA256": "d921b3ef61019892e3dca791d3c0352b0d61a7ae720a61c236d0a5ff0ab1e8b0"
+    },
+    {
+      "Path": "verification/packaging-tests.txt",
+      "SHA256": "d4a5025503f0fdd6b58cc991e9ef6fd6671120c5b25ce63a0b0571b66bc35be0"
+    },
+    {
+      "Path": "verification/windows-resource-blocked-on-linux.txt",
+      "SHA256": "e0fd54ca1ba34e1a6d9b77f05e2981236e86a63890cf489b80846fe41d308c91"
+    }
+  ]
+}

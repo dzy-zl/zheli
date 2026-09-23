@@ -1,0 +1,29 @@
+PASS request endpoint, authorization and bounded output
+PASS model list filters and deduplicates
+PASS empty model list
+PASS HTTP 401 safely classified
+PASS HTTP 402 safely classified
+PASS HTTP 429 safely classified
+PASS HTTP 400 safely classified
+PASS HTTP 422 safely classified
+PASS HTTP 404 safely classified
+PASS HTTP 500 safely classified
+PASS HTTP 503 safely classified
+PASS HTTP 302 safely classified
+PASS malformed or empty response rejected
+PASS malformed or empty response rejected
+PASS malformed or empty response rejected
+PASS malformed or empty response rejected
+PASS malformed or empty response rejected
+PASS malformed or empty response rejected
+PASS output truncation disclosed
+PASS filtered response classified
+PASS oversized response rejected
+PASS connection details never disclosed
+PASS timeout distinguished from cancellation
+PASS deadline includes stalled response body
+PASS user cancellation preserved
+PASS invalid credential rejected before dispatch
+PASS invalid role rejected before dispatch
+PASS failure makes one request without retry
+RESULT: 28 passed, 0 failed; offline HTTP transport tests

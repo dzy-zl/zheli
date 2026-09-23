@@ -1,0 +1,13 @@
+{
+  "version": "0.2.3",
+  "date": "2026-09-23",
+  "environment": "Linux x64, PowerShell 7.5.3",
+  "packagingChecks": { "passed": 20, "failed": 0, "syntheticPayloadOnly": true },
+  "dotnetTestsThisVersion": "not run",
+  "managedCompilationThisVersion": "not run",
+  "nativeWindowsPublish": "pending",
+  "innoCompilation": "pending",
+  "windowsInstallAndStartup": "pending",
+  "installerArtifactsProduced": false,
+  "nextRequirement": "Dedicated Zheli GitHub repository for prepared Windows workflow"
+}

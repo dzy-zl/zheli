@@ -1,0 +1,12 @@
+[
+  {
+    "path": "Languages/ChineseSimplified.isl",
+    "source": "https://raw.githubusercontent.com/jrsoftware/issrc/is-6_5_4/Files/Languages/Unofficial/ChineseSimplified.isl",
+    "sha256": "fc1dbf303559cfefd47cf59eec7f1ad1c5fc6266ef8fa64569c13bc754adfeb4"
+  },
+  {
+    "path": "licenses/Inno-Setup-6.5.4-license.txt",
+    "source": "https://raw.githubusercontent.com/jrsoftware/issrc/is-6_5_4/license.txt",
+    "sha256": "a7f97b166be34fc8bf04e79617b9f56b2aa7903a2808f94155e449c80bdfdcc2"
+  }
+]

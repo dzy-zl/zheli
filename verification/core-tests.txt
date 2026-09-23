@@ -1,0 +1,101 @@
+PASS baseline valid
+PASS week anchor Monday
+PASS date before first Monday is week zero
+PASS pre-teaching recurring excluded
+PASS manual pre-teaching temporary allowed
+PASS odd weeks only
+PASS noncontinuous weeks
+PASS reject descending range
+PASS reject week beyond semester
+PASS reject empty weeks
+PASS cross-week move preserves two periods
+PASS out-of-period move rejected
+PASS out-of-semester move rejected
+PASS cancelled occupies no time
+PASS restore override
+PASS revision preserves prior weeks
+PASS revision retains explicit future move
+PASS orphaned exception blocks edit
+PASS season schedule keeps period IDs
+PASS same period conflict detected
+PASS adjacent lessons do not conflict
+PASS cancel clears conflict
+PASS duplicate IDs rejected
+PASS non-Monday anchor rejected
+PASS overlapping schedule rejected
+PASS invalid course color rejected
+PASS delete course preserves recoverable bundle
+PASS delete last arrangement retains course
+PASS prepared change checks owner
+PASS prepared change expires
+PASS prepared change retains captured revision
+PASS SQLite persistence
+PASS transaction rollback on validation
+PASS optimistic concurrency
+PASS prepared modification cannot overwrite intervening save
+PASS idempotency returns original receipt
+PASS same id with different payload rejected
+PASS undo restores prior state
+PASS undo rejects subsequent changes
+PASS SQLite backup reopens
+PASS encrypted backup roundtrip
+PASS encrypted backup rejects wrong password
+PASS encrypted backup rejects wrong app
+PASS encrypted backup refuses overwriting existing file
+PASS portable backup cleans unencrypted staging snapshot
+PASS encrypted backup tamper rejected
+PASS draft survives reopening
+PASS unknown future schema rejected
+PASS wire message roundtrip
+PASS wire rejects oversized frame
+PASS local search only authorized txt/md
+PASS local search skips symlink escape
+PASS document TXT preserves line number
+PASS document UTF16 BOM is detected
+PASS long text retains cross-chunk keyword
+PASS DOCX joins runs and reports paragraphs
+PASS PPTX follows presentation relationship order
+PASS XLSX preserves sheet cell cached formula and hidden status
+PASS OOXML prohibits DTD entity expansion
+PASS OOXML does not follow external slide relationships
+PASS OOXML rejects oversized XML part
+PASS PDF page provenance and empty scan notice
+PASS knowledge first search builds index
+PASS knowledge persisted index reused after reopening
+PASS knowledge detects edits with unchanged size and timestamp
+PASS knowledge keyword SQL characters are literal
+PASS cloud grants validated per source
+PASS cloud refuses changed source after preview
+PASS private child beats parent cloud permission
+PASS disabled private child still blocks parent cloud permission
+PASS disabled child excludes parent indexed results
+PASS path sibling is outside authorized root
+PASS revoked root removes persisted chunks
+PASS deleted source is removed on refresh
+PASS damaged document reports incomplete extraction
+PASS pre-cancelled index update aborts
+PASS private and cloud grant combination rejected
+PASS knowledge rejects symlink ancestor above grant
+PASS knowledge skips symlink escape files
+PASS pet default placement respects 150 percent pixel size
+PASS pet placement supports negative monitor origin
+PASS pet placement supports monitor above main
+PASS pet placement capture roundtrip
+PASS pet ratio survives work area change
+PASS pet changed DPI keeps entire window visible
+PASS pet tiny work area remains reachable
+PASS pet invalid ratios fall back and clamp
+PASS pet offscreen capture clamps to visible ratios
+PASS pet nearby edge snaps without crossing work area
+PASS pet interior does not snap
+PASS pet saved monitor selected case insensitively
+PASS pet removed monitor falls back to primary
+PASS pet small pointer jitter remains a click
+PASS pet drag starts once and never becomes click
+PASS pet distant release without move event is not click
+PASS pet lost capture cancels pending click
+PASS pet release without press is ignored
+PASS pet new click works after cancelled drag
+PASS pet local position and hidden state persist
+RESULT: 99 passed, 0 failed
+Windows UI, named-pipe identity, credential vault and live DeepSeek are not covered by this cross-platform runner.

@@ -1,0 +1,250 @@
+[
+  {
+    "package": "Microsoft.Data.Sqlite",
+    "version": "10.0.9",
+    "license": {
+      "value": "MIT",
+      "type": "expression"
+    },
+    "projectUrl": {
+      "value": "https://docs.microsoft.com/dotnet/standard/data/sqlite/"
+    }
+  },
+  {
+    "package": "Microsoft.Data.Sqlite.Core",
+    "version": "10.0.9",
+    "license": {
+      "value": "MIT",
+      "type": "expression"
+    },
+    "projectUrl": {
+      "value": "https://docs.microsoft.com/dotnet/standard/data/sqlite/"
+    }
+  },
+  {
+    "package": "Microsoft.Web.WebView2",
+    "version": "1.0.3719.77",
+    "license": {
+      "value": "LICENSE.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://aka.ms/webview"
+    }
+  },
+  {
+    "package": "Microsoft.Windows.AI.MachineLearning",
+    "version": "2.1.74",
+    "license": {
+      "value": "license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://github.com/microsoft/windowsappsdk"
+    }
+  },
+  {
+    "package": "Microsoft.Windows.SDK.BuildTools",
+    "version": "10.0.26100.4654",
+    "projectUrl": {
+      "value": "https://aka.ms/WinSDKProjectURL"
+    }
+  },
+  {
+    "package": "Microsoft.Windows.SDK.BuildTools.MSIX",
+    "version": "1.7.251221100",
+    "license": {
+      "value": "sdk_license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://aka.ms/WinSDKProjectURL"
+    }
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK",
+    "version": "2.5.1",
+    "license": {
+      "value": "license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://github.com/microsoft/windowsappsdk"
+    }
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.AI",
+    "version": "2.5.5",
+    "license": {
+      "value": "license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://github.com/microsoft/windowsappsdk"
+    }
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.Base",
+    "version": "2.0.4",
+    "license": {
+      "value": "license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://github.com/microsoft/windowsappsdk"
+    }
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.DWrite",
+    "version": "2.1.0",
+    "license": {
+      "value": "license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://aka.ms/WindowsAppSDK"
+    }
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.Foundation",
+    "version": "2.3.12",
+    "license": {
+      "value": "license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://aka.ms/windowsappsdk"
+    }
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.InteractiveExperiences",
+    "version": "2.1.9",
+    "license": {
+      "value": "license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://aka.ms/windowsappsdk"
+    }
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.ML",
+    "version": "2.1.94",
+    "license": {
+      "value": "license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://github.com/microsoft/windowsappsdk"
+    }
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.Runtime",
+    "version": "2.5.1",
+    "license": {
+      "value": "license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://github.com/microsoft/windowsappsdk"
+    }
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.Search",
+    "version": "2.5.5",
+    "license": {
+      "value": "license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://github.com/microsoft/windowsappsdk"
+    }
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.Widgets",
+    "version": "2.0.5",
+    "license": {
+      "value": "license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://github.com/microsoft/windowsappsdk"
+    }
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.WinUI",
+    "version": "2.3.9",
+    "license": {
+      "value": "license.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://github.com/microsoft/windowsappsdk"
+    }
+  },
+  {
+    "package": "PdfPig",
+    "version": "0.1.16",
+    "license": {
+      "value": "Apache-2.0",
+      "type": "expression"
+    },
+    "projectUrl": {
+      "value": "https://github.com/UglyToad/PdfPig"
+    }
+  },
+  {
+    "package": "SQLite",
+    "version": "3.53.4",
+    "license": {
+      "value": "LICENSE.txt",
+      "type": "file"
+    },
+    "projectUrl": {
+      "value": "https://sqlite.org/"
+    }
+  },
+  {
+    "package": "SQLitePCLRaw.bundle_e_sqlite3",
+    "version": "3.0.5",
+    "license": {
+      "value": "Apache-2.0",
+      "type": "expression"
+    }
+  },
+  {
+    "package": "SQLitePCLRaw.config.e_sqlite3",
+    "version": "3.0.5",
+    "license": {
+      "value": "Apache-2.0",
+      "type": "expression"
+    }
+  },
+  {
+    "package": "SQLitePCLRaw.core",
+    "version": "3.0.5",
+    "license": {
+      "value": "Apache-2.0",
+      "type": "expression"
+    }
+  },
+  {
+    "package": "SQLitePCLRaw.provider.e_sqlite3",
+    "version": "3.0.5",
+    "license": {
+      "value": "Apache-2.0",
+      "type": "expression"
+    }
+  },
+  {
+    "package": "System.Numerics.Tensors",
+    "version": "9.0.0",
+    "license": {
+      "value": "MIT",
+      "type": "expression"
+    },
+    "projectUrl": {
+      "value": "https://dot.net/"
+    }
+  }
+]
