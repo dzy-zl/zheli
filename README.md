@@ -1,6 +1,8 @@
 # 哲里 · Windows 原生开发版 0.2.3
 
-0.2.3 优先准备三个独立的 Windows 测试版安装器：哲里设置、哲里课表、哲喵。已加入完整 Windows 发布、安装器编译和安装/启动/共存卸载自动检查流程。Linux 上 20 项脚本及合成载荷检查通过；本版本尚未完成 Windows 编译或安装运行，不能把源码包当作安装包。下一步是将本目录提交到哲里专用 GitHub 仓库并运行 Actions。操作见 [安装包构建](docs/INSTALLER-BUILD.md)。
+**三个测试版安装包已生成并通过 Windows 自动验证。** [下载安装包 ZIP（约 594 MB，需登录 GitHub）](https://github.com/dzy-zl/zheli/actions/runs/35932215812/artifacts/10781757593)。包含哲里设置、哲里课表、哲喵三个 EXE 安装器，以及 SHA-256 校验清单。此产物保留至 2026-10-07，之后可重新运行构建。
+
+0.2.3 完成六个程序的 Windows 原生发布、三个安装器编译，以及安装/启动/共存卸载自动检查。96 项核心测试、28 项客户端离线测试、19 项打包检查通过。[通过记录](https://github.com/dzy-zl/zheli/actions/runs/35932215812)对应提交 `a2bdb280224edcb1dae5a085626251eebe795527`。构建与安装方法见 [安装包构建](docs/INSTALLER-BUILD.md)。
 
 0.2.2 补齐桌宠位置与隐藏状态记忆、跨屏缩放后的可见范围恢复、拖动与点击区分，以及呼吸/眨眼/耳朵/尾巴轻量动画。降低动态效果、远程桌面或软件渲染时使用静态角色。详见 [桌宠使用与验收](docs/PET-DESKTOP.md)。最终角色资产与 Windows 实机视觉验收仍待完成。
 
@@ -8,7 +10,7 @@
 
 这是哲里设置、哲里课表、哲喵三个独立软件的源码工程。已实现真实本地数据保存与应用间接口，不是网页演示；目前仍是开发版本，尚未达到正式发行条件。
 
-**本包是源码，不是可直接安装的 EXE。** 当前环境为 Linux。0.2.2 的核心测试和 Windows 目标托管编译记录作为历史证据保留，未视为本版本重新通过。Windows 资源生成、应用启动、桌面交互、安装卸载及凭据管理尚未实测；DeepSeek 客户端已在 0.2.1 通过合成内容的实网调用。请先阅读 [实现与验收状态](docs/STATUS.md)。
+GitHub 的 Code → Download ZIP 下载的是源码；请使用上面的安装包链接。自动验证运行于 Windows Server 2025，不代替你电脑上的 Windows 11、150% DPI 视觉与完整业务验收。安装器未签名，正式图标和角色资产尚未完成；请阅读 [实现与验收状态](docs/STATUS.md)。
 
 ## 在 Windows 11 上构建
 
@@ -29,7 +31,7 @@ pwsh -File .\scripts\install-inno-compiler.ps1
 pwsh -File .\scripts\build-installers.ps1
 ```
 
-输出到 `artifacts/installers-<构建编号前12位>`。课表或哲喵安装器会在缺少公共组件时自动安装内置的哲里设置，不依赖哲里桌面；设置窗口无需常驻。三个安装记录分别维护，卸载课表不删除哲喵。哲里设置须在依赖它的应用卸载后再卸载，业务数据保留。不同构建暂不允许原地覆盖。安装器尚未签名，完整 Windows 构建和运行仍待验证。旧 `install-user.ps1` 仅保留给便携开发目录，不可与新安装器混用。
+输出到 `artifacts/installers-<构建编号前12位>`。课表或哲喵安装器会在缺少公共组件时自动安装内置的哲里设置，不依赖哲里桌面；设置窗口无需常驻。三个安装记录分别维护，卸载课表不删除哲喵。哲里设置须在依赖它的应用卸载后再卸载，业务数据保留。不同构建暂不允许原地覆盖。安装器尚未签名。旧 `install-user.ps1` 仅保留给便携开发目录，不可与新安装器混用。
 
 首次使用：
 
@@ -74,4 +76,4 @@ dotnet run --project tests/Zheli.Tests/Zheli.Tests.csproj -c Release
 
 0.2.2 的 Linux 核心测试历史结果见 `verification/core-tests.txt`；0.2.3 本轮打包检查见 `verification/packaging-tests.txt`，两者不能混作同一版本验收。Windows 核心测试会跳过依赖 Linux 符号链接的 3 项。图形界面验收步骤见 [WINDOWS-ACCEPTANCE.md](docs/WINDOWS-ACCEPTANCE.md)，接口和数据设计见 [ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 
-`assets/reference` 保留用户提供的哲喵形象和此前图标方向图。当前桌宠使用临时矢量实现；尚未把已选哲喵 A、课表 C 制作为正式多尺寸图标，也没有冒称它们已接入。未打包苹方字体。依赖与素材来源见 [THIRD-PARTY.md](docs/THIRD-PARTY.md)。
+用户提供的哲喵形象和此前图标方向图仅保留在私有交付源码包，未上传到本公开仓库。当前桌宠使用临时矢量实现；尚未把已选哲喵 A、课表 C 制作为正式多尺寸图标。未打包苹方字体。依赖与素材来源见 [THIRD-PARTY.md](docs/THIRD-PARTY.md)。

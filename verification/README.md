@@ -2,9 +2,13 @@
 
 ## 0.2.3 本轮结果
 
+Windows 最终验证已完成：运行 [35932215812](https://github.com/dzy-zl/zheli/actions/runs/35932215812)，提交 `a2bdb280224edcb1dae5a085626251eebe795527`，Windows Server 2025 x64、SDK 10.0.100。96 项核心、28 项离线客户端、19 项打包检查通过；原生发布、三个安装器编译、窗口/桌宠启动及共存卸载流程通过。机器可读记录见 `windows-ci.json`。下面的准备阶段和 0.2.2 日志保留为历史，不能与本次运行混用。
+
+## 0.2.3 安装器准备阶段历史记录
+
 环境：Linux x64，PowerShell 7.5.3。`packaging-tests.txt` 记录 20 项通过、0 项失败，包括 10 个脚本解析检查和 10 项合成载荷校验。合成文件只用于验证打包规则，不是真实应用程序。
 
-`installer-preparation.json` 记录当前阻塞：尚无哲里专用 GitHub 仓库运行 Windows 流程。本版本未重新运行 .NET 核心/客户端测试，未重新编译六个应用；Inno 编译、Windows 启动、安装卸载和视觉验收均待执行。下表及其日志属于 0.2.2 或更早版本，不能据此认定 0.2.3 已通过相同测试。
+`installer-preparation.json` 记录提交 GitHub 前的状态，当时尚未进行 Windows 构建。该阻塞现已解除，以本页开头的 Windows 最终记录为准。下表及其日志属于 0.2.2 或更早版本，不能据此认定 0.2.3 已通过相同测试。
 
 复测本轮脚本检查：`pwsh -NoProfile -File tests/Packaging.Tests.ps1`。Windows 跳过 Linux 符号链接检查，预期 19 项；实际通过数以运行日志为准。
 

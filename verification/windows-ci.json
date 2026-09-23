@@ -1,0 +1,44 @@
+{
+  "version": "0.2.3",
+  "repository": "dzy-zl/zheli",
+  "testedCommit": "a2bdb280224edcb1dae5a085626251eebe795527",
+  "runId": 35932215812,
+  "jobId": 107421168210,
+  "result": "success",
+  "environment": "GitHub-hosted Windows Server 2025 x64",
+  "dotnetSdk": "10.0.100",
+  "innoEngine": "6.5.4",
+  "tests": { "core": 96, "offlineClient": 28, "packaging": 19, "failed": 0 },
+  "nativePublish": "passed for all six executable projects",
+  "settingsPreflight": "native window created and survived startup",
+  "installerChecks": [
+    "Timetable installs Settings and CoreHost prerequisites",
+    "Settings, Timetable and Miao create native windows and survive startup",
+    "PetHost process survives startup",
+    "Same-build reinstall preserves the synthetic data canary",
+    "Different-build overwrite is rejected",
+    "Dependent applications prevent common-service uninstall",
+    "Timetable uninstall preserves Miao and common components",
+    "Miao still starts after Timetable uninstall",
+    "Miao uninstall preserves Settings",
+    "Final Settings uninstall removes common program files",
+    "All uninstall operations preserve the synthetic data canary"
+  ],
+  "artifact": {
+    "id": 10781757593,
+    "name": "Zheli-Windows-x64-Test-Installers",
+    "url": "https://github.com/dzy-zl/zheli/actions/runs/35932215812/artifacts/10781757593",
+    "sizeBytes": 594135951,
+    "sha256": "78eac234f93f9754a015475ecf456ae72b9aeafa4fff889691db3e460a289256",
+    "expiresUtc": "2026-10-07T23:19:06Z",
+    "buildIdPrefix": "068a55f02059",
+    "signed": false
+  },
+  "limitations": [
+    "Windows 11 personal-machine and 150% DPI visual acceptance not performed",
+    "Short startup checks do not verify all business interactions, IPC authorization, credential storage or long-running stability",
+    "No live DeepSeek call or personal files used in CI",
+    "Final icons and character assets remain incomplete",
+    "Pinned upstream Chinese installer translation has missing messages that fall back to English"
+  ]
+}

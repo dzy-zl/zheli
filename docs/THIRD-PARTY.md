@@ -6,7 +6,7 @@ Inno Setup 固定为 6.5.4，编译器来自 `jrsoftware/issrc` 官方 GitHub re
 
 简体中文语言文件取自同一版本标签下 `Files/Languages/Unofficial/ChineseSimplified.isl`，保持原文；许可全文保留于 `installer/licenses/Inno-Setup-6.5.4-license.txt`。精确 URL 与资源哈希见 `installer/third-party-sources.json`。按该固定版本许可保留版权、许可和免责声明；未将其标注为 MIT。
 
-Windows 发布阶段从实际 NuGet 缓存复制依赖 license/notice/nuspec，并从 SPDX `license-list-data` 的 `v3.27.0` 标签取得 MIT 与 Apache-2.0 全文，随各程序放入 `ThirdPartyNotices`。依赖许可收集已实现但尚未在本版本 Windows 发布中执行，不代替最终发行时对产物的核对。
+Windows 发布阶段从实际 NuGet 缓存复制依赖 license/notice/nuspec，并从 SPDX `license-list-data` 的 `v3.27.0` 标签取得 MIT 与 Apache-2.0 全文，随各程序放入 `ThirdPartyNotices`。此收集流程已在最终 Windows CI 执行通过，不代替正式发行时对所有产物的许可核对。固定版本的上游中文翻译有部分消息缺失，安装器编译会提示并回退英文，记录为当前测试版限制。
 
 ## 运行与构建依赖
 
@@ -36,4 +36,4 @@ Windows 发布阶段从实际 NuGet 缓存复制依赖 license/notice/nuspec，�
 
 字体优先使用用户电脑已安装的 PingFang SC，回退 Microsoft YaHei UI、Segoe UI。源码包和安装脚本不包含或下载苹方。
 
-`assets/reference/miao-character.jpg` 是本会话中用户提供的哲喵形象原文件。`selected-icon-directions.png` 是本会话生成的候选方向图，仅保留作设计参考；哲喵选 A、课表选 C 的决定不变。未对来源图作额外权利授权的推断，未向公共素材站发布。当前桌宠是工程内独立绘制的临时矢量形象，正式图标/角色资产导出仍待完成。
+私有交付源码包的 `assets/reference/miao-character.jpg` 是用户提供的哲喵形象，`selected-icon-directions.png` 是候选方向图；两者均不包含在本公开仓库或当前安装包中。哲喵选 A、课表选 C 的决定不变。当前桌宠是工程内独立绘制的临时矢量形象，正式图标/角色资产导出仍待完成。

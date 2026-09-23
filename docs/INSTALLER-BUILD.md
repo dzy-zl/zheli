@@ -1,6 +1,8 @@
 # 三个测试版安装包
 
-当前状态：构建流程已编写，尚未生成或验证 Windows EXE。此源码为 0.2.3 开发版，不能视为正式发行。
+当前状态：0.2.3 三个 EXE 已生成，Windows 原生发布和安装启动/卸载自动测试通过。[下载安装包](https://github.com/dzy-zl/zheli/actions/runs/35932215812/artifacts/10781757593)，[查看通过记录](https://github.com/dzy-zl/zheli/actions/runs/35932215812)。这是未签名测试版，不能视为正式发行。
+
+下载 ZIP 后解压，依次运行 Settings、Timetable、Miao 安装器，或只运行所需软件的安装器。安装后通过开始菜单的“哲里”文件夹启动。第一次安装无需打开任何哲里程序，全部安装完再启动。
 
 ## 使用 GitHub Windows 构建
 

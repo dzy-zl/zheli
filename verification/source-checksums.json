@@ -1,10 +1,10 @@
 {
   "version": "0.2.3",
-  "scope": "public repository; reference images excluded",
+  "scope": "GitHub UTF-8 text contents, LF normalized; reference images excluded",
   "files": [
     {
       "Path": ".github/workflows/windows-build.yml",
-      "SHA256": "3e649d70906b98e5b3f9c9cfce68d42caecbed7e4d9f8ad702798ceb83ba88f3"
+      "SHA256": "6b64dae6eabb935bf45901578cf1ab48713bbb646a5acbf72855cf6b140c2c2c"
     },
     {
       "Path": ".gitignore",
@@ -15,12 +15,16 @@
       "SHA256": "7b676466f791ada13c19e0591941ef6acbe47da9f593d76e7c5d8184a2caa013"
     },
     {
+      "Path": "Directory.Build.targets",
+      "SHA256": "5d5a57ab6549e2fb82a1022ac19232a13d38574839041ec1b61c7c1d338aa8cd"
+    },
+    {
       "Path": "NuGet.Config",
       "SHA256": "17f8588bd0874138a10e92eb9efee6e346a173591124ab57872f019475f8f81a"
     },
     {
       "Path": "README.md",
-      "SHA256": "de4e34b0b004b92152280a0ff0941472b35082efe9263109fd5418d72616d07c"
+      "SHA256": "4a4ce54f2eaee614a55304e594b94b4da219e767db377451e73a68e0b27b48e9"
     },
     {
       "Path": "Zheli.slnx",
@@ -32,11 +36,11 @@
     },
     {
       "Path": "docs/ARCHITECTURE.md",
-      "SHA256": "eb02388e9977cb0ea7f39d1d26632cbf0ac0ad732a93135eab768697c43169d6"
+      "SHA256": "ffc91c973a36029bbd37063422199a7c608644942b1028f9962f6e436f67d12d"
     },
     {
       "Path": "docs/CHANGELOG.md",
-      "SHA256": "a281a83c0f4755d3cecee067534ed0c09841c4ffd8298135f8e1ce6febb87eed"
+      "SHA256": "4a5f2002f6780871599b3fa3618ebe80e991825ac57d6a01ed9834b8aa88804d"
     },
     {
       "Path": "docs/DEEPSEEK-TESTING.md",
@@ -44,7 +48,7 @@
     },
     {
       "Path": "docs/INSTALLER-BUILD.md",
-      "SHA256": "5774bdc7a5137f103f42f84db0a315206229866c0eed9e788cdc0f36bb0e4a5e"
+      "SHA256": "0dd56a91d026d96d0c9b0b2e785d6be6bfd9e12755b09da62e4d84c6aef6eb8d"
     },
     {
       "Path": "docs/KNOWLEDGE.md",
@@ -56,31 +60,31 @@
     },
     {
       "Path": "docs/STATUS.md",
-      "SHA256": "92548a033668f1ed0e3dfe2e23fc62581bd8592f9afeec636d3234d01cf71124"
+      "SHA256": "24ec469786ec556641f53a8ac54ad0419178c93d4749dcfec192429de05e02ef"
     },
     {
       "Path": "docs/THIRD-PARTY.md",
-      "SHA256": "5812d68217b9cb4bad57b92d6b08916aaaa71e41daed674e04605e6cac5095de"
+      "SHA256": "2255851d705a26f0bed5c84ddc9a5198ce437b0b52582fcbd3d7475fb2ebb359"
     },
     {
       "Path": "docs/WINDOWS-ACCEPTANCE.md",
-      "SHA256": "2e0a9de75ce2db5a893670b0c0e0023eed11b12f60f406546f70784db70720bc"
+      "SHA256": "6ca2e82d6627a03e16c53181144ac947b18b4d7ed14769fb7f1704cb8aa183f0"
     },
     {
       "Path": "global.json",
-      "SHA256": "7fd1f7f4ffa8b0dac6a02355cdc371c1623638cfbe10559759b87403d807bf78"
+      "SHA256": "0aa4b85ae248d59bbc4138f346d952b7fae4fe18cc701d921fa1c003211be777"
     },
     {
       "Path": "installer/Languages/ChineseSimplified.isl",
-      "SHA256": "fc1dbf303559cfefd47cf59eec7f1ad1c5fc6266ef8fa64569c13bc754adfeb4"
+      "SHA256": "f2a4cb85bba349139dbe21320989c96429b556f4502ce029d0b06a7ee2eceaa1"
     },
     {
       "Path": "installer/Zheli.iss",
-      "SHA256": "3254c2f45968a581ab833fb4bf0b3e456cfa14fd8f8c1e2cafb645bf12753256"
+      "SHA256": "86da8bee4116d44579d7a0a3f083b4d0f7fbf92271504bee75e162ffefabb0e8"
     },
     {
       "Path": "installer/licenses/Inno-Setup-6.5.4-license.txt",
-      "SHA256": "a7f97b166be34fc8bf04e79617b9f56b2aa7903a2808f94155e449c80bdfdcc2"
+      "SHA256": "0899965d3ce6d9810d28d36d10c466b134e415cb871b846e4d56a52d0562bb1d"
     },
     {
       "Path": "installer/third-party-sources.json",
@@ -92,11 +96,11 @@
     },
     {
       "Path": "scripts/build-installers.ps1",
-      "SHA256": "d0cc1f5b21d6462fbcd319370c7bed5fca293c2f9c56ddf0fa585cb9302bbe6a"
+      "SHA256": "38bece2c203490c0fce89cae1aaf392f326a2fd34a182b116c8c497a7b6c56d5"
     },
     {
       "Path": "scripts/build-windows.ps1",
-      "SHA256": "82174c1e304f4fc38f11cc688b2033eef082d919193f40c38e1daaf2058409e8"
+      "SHA256": "19e6cbe3717325982f27b57e14e8e8c25b4f0de909e81e4ef447b54a9374b2fe"
     },
     {
       "Path": "scripts/collect-notices.ps1",
@@ -116,7 +120,7 @@
     },
     {
       "Path": "scripts/test-installers-windows.ps1",
-      "SHA256": "26f9afd5b882705c3e98680f764f75f39b259a79b9ead2e8231897c5ed521fce"
+      "SHA256": "4590f41e141ceae727b91f3321cab64e6fb8273b648f2daa90174ac861c2799e"
     },
     {
       "Path": "scripts/uninstall-user.ps1",
@@ -160,15 +164,15 @@
     },
     {
       "Path": "src/Zheli.DesignSystem/.mono/registry/CurrentUser/software/microsoft/sqmclient/values.xml",
-      "SHA256": "c13e0aa9cabbf75048f54c43c4755b43d03580a266cbb6a93d32a50c2ef38c52"
+      "SHA256": "00898eb57bbad8ff7ee24b354f31d73339d03f6a8471a68b880a674e7f16472b"
     },
     {
       "Path": "src/Zheli.DesignSystem/.mono/registry/CurrentUser/software/microsoft/visualstudio/telemetry/default/v2/values.xml",
-      "SHA256": "fa8dcbc481d690566aa8b7787dbab1179a8f4f67223b04bf5acc36a30e9ab0ed"
+      "SHA256": "0ba1e31e225ef7c61f5e1039f5a05e319a0f7d1890b2d3708f2bc741b18e8d5f"
     },
     {
       "Path": "src/Zheli.DesignSystem/.mono/registry/CurrentUser/software/microsoft/visualstudio/telemetry/values.xml",
-      "SHA256": "fa8dcbc481d690566aa8b7787dbab1179a8f4f67223b04bf5acc36a30e9ab0ed"
+      "SHA256": "0ba1e31e225ef7c61f5e1039f5a05e319a0f7d1890b2d3708f2bc741b18e8d5f"
     },
     {
       "Path": "src/Zheli.DesignSystem/AppActivation.cs",
@@ -179,12 +183,16 @@
       "SHA256": "e153a4f00df2a9f6ade9722bebb6cb0a28ca735fb52cc8bb8754a20e6454b935"
     },
     {
+      "Path": "src/Zheli.DesignSystem/StartupDiagnostics.cs",
+      "SHA256": "e4cf8621a3068bca6fab299c987e025a2e4fe059b55c11206a205f44dc9bed8b"
+    },
+    {
       "Path": "src/Zheli.DesignSystem/Ui.cs",
       "SHA256": "e1ed09f82b89cd7d5b3dcdd71512cc71e2853099d3c2bcbe33dbc22b8f683358"
     },
     {
       "Path": "src/Zheli.DesignSystem/Zheli.DesignSystem.csproj",
-      "SHA256": "e915e5ff20cf861f553cd2e58c8a52ed9c32e7b10bb7310c55754bbdea5a98f0"
+      "SHA256": "81ee053a4ed09017dd72d3153b4ed1104b6b27dd1ed42717dcad37ac5f5cead5"
     },
     {
       "Path": "src/Zheli.DesignSystem/packages.lock.json",
@@ -223,6 +231,10 @@
       "SHA256": "c30b149eb0b6c271aabe8d79d7b0318ba25f0bbd2ebf6a08faa3b67056bce9b3"
     },
     {
+      "Path": "src/Zheli.Miao/App.xaml",
+      "SHA256": "8d43dad5c99faa9f58ef8224f357983e0f7bc645164e3e444bf5c5e31b5788b9"
+    },
+    {
       "Path": "src/Zheli.Miao/Conversation.cs",
       "SHA256": "40f0b60ee2563e237976deaace92a5e51e2072b58f442e661f1fe0cdcb812961"
     },
@@ -232,7 +244,7 @@
     },
     {
       "Path": "src/Zheli.Miao/Program.cs",
-      "SHA256": "575007c968b63f94e1366d3207777c3173e445ace2c88c6019a22d1c32e18664"
+      "SHA256": "be10300e89e508c54cb88063026758a46ad1c0b138ea1cd378e1c4b31308ab42"
     },
     {
       "Path": "src/Zheli.Miao/Zheli.Miao.csproj",
@@ -283,8 +295,12 @@
       "SHA256": "dcd9584fe342433320b6dc3f58941c8f2110947e6f3f8c6763a2bbaca6876034"
     },
     {
+      "Path": "src/Zheli.Settings/App.xaml",
+      "SHA256": "5bf2a85baf5d6a27964f2c99fc3dffc770008f0e464963c9b7f73ee166f0ffe0"
+    },
+    {
       "Path": "src/Zheli.Settings/Program.cs",
-      "SHA256": "14a819835ed8d1a3778dd525dbb79128814539dc2bca196e88b647dae34f96e5"
+      "SHA256": "970a9c34e957e0d73388c171e2857c9cae4c18f8f582ec58f9504730ef0e2948"
     },
     {
       "Path": "src/Zheli.Settings/SettingsWindow.cs",
@@ -319,8 +335,12 @@
       "SHA256": "9f2fd13acbf972b5b9212569793a1c416f9c2ecf76f35806eb321485e19d5e96"
     },
     {
+      "Path": "src/Zheli.Timetable/App.xaml",
+      "SHA256": "dd8f167b6ac926930e95132d876b94d090d803befe4e153b1fb2e483505e4977"
+    },
+    {
       "Path": "src/Zheli.Timetable/Program.cs",
-      "SHA256": "caa3e4d3ddbc76f5f5f1e632d2d306e7a479e68dd3829009c9d9a6badcc1928c"
+      "SHA256": "700f1c5b2800cafbbf10da4caf656d56fb0196f59a3ac42d4a2b1aa16a90d46f"
     },
     {
       "Path": "src/Zheli.Timetable/TimetableWindow.cs",
@@ -388,7 +408,7 @@
     },
     {
       "Path": "verification/README.md",
-      "SHA256": "fff816768bc0f8f11bc5e1fc1a98b1225c27c09cc0d97bbbeaeb89c280fbf57d"
+      "SHA256": "d6794514778e0ec1179a4f19889f30ba1b3e618d70790f8ab3dd78531633e1e9"
     },
     {
       "Path": "verification/core-tests.txt",
@@ -445,6 +465,10 @@
     {
       "Path": "verification/packaging-tests.txt",
       "SHA256": "d4a5025503f0fdd6b58cc991e9ef6fd6671120c5b25ce63a0b0571b66bc35be0"
+    },
+    {
+      "Path": "verification/windows-ci.json",
+      "SHA256": "969b603b4dbed0ea4fdda0cecc2aa45e0c7aa453c2a4e9166e5df3a9267930e8"
     },
     {
       "Path": "verification/windows-resource-blocked-on-linux.txt",
