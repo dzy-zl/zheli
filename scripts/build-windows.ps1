@@ -23,7 +23,7 @@ try {
     New-Item -ItemType Directory -Path $stage | Out-Null
     foreach($app in @('Zheli.CoreHost','Zheli.Timetable.Host','Zheli.Settings','Zheli.Timetable','Zheli.Miao','Zheli.PetHost')) {
         Invoke-Dotnet -Arguments @('publish',"src/$app/$app.csproj",'-c',$Configuration,'-r','win-x64','--self-contained','true',
-            '-m:1','-p:BuildInParallel=false','-p:UseSharedCompilation=false','-p:PublishSingleFile=false','-p:WindowsAppSDKSelfContained=true','-o',"$stage/$app")
+            '-m:1','-p:BuildInParallel=false','-p:UseSharedCompilation=false','-p:PublishSingleFile=false','-o',"$stage/$app")
     }
     & (Join-Path $PSScriptRoot 'collect-notices.ps1') -PublishedRoot $stage
     & (Join-Path $PSScriptRoot 'Test-PublishLayout.ps1') -Path $stage
