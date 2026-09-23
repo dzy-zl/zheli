@@ -11,9 +11,12 @@ if(-not $build.TestsPassed -or -not $build.NativeWindowsResources -or $build.Con
 if($build.Version -notmatch '^\d+\.\d+\.\d+$' -or $build.BuildId -notmatch '^[a-fA-F0-9]{64}$'){throw 'Invalid build metadata.'}
 if(-not $Compiler){$Compiler=Join-Path $env:LOCALAPPDATA 'Programs/ZheliBuildTools/InnoSetup-6.5.4/ISCC.exe'}
 if(-not(Test-Path -LiteralPath $Compiler)){throw 'Run scripts/install-inno-compiler.ps1 first, or pass -Compiler.'}
-$compilerHelp=(& $Compiler '/?' 2>&1 | Out-String)
-if($LASTEXITCODE -ne 0 -or $compilerHelp -notmatch '(?im)^\s*Compiler engine version 6\.5\.4(?:\s|$)'){
-    throw "Use the pinned Inno Setup 6.5.4 compiler engine. Reported identity: $compilerHelp"
+# ISCC /? exits 1 before loading the engine; launcher PE metadata has no engine version.
+# Compile an in-memory, no-output script to query the engine actually loaded.
+$probe="[Setup]`nAppName=Zheli compiler check`nAppVersion=0`nCreateAppDir=no`nUninstallable=no`nOutput=no"
+$compilerIdentity=($probe | & $Compiler '/O-' '-' 2>&1 | Out-String)
+if($LASTEXITCODE -ne 0 -or $compilerIdentity -notmatch '(?im)^\s*Compiler engine version:\s+[^\r\n]*\b6\.5\.4(?:\s|$)'){
+    throw "Use the pinned Inno Setup 6.5.4 compiler engine. Reported identity: $compilerIdentity"
 }
 $output=Join-Path $root ('artifacts/installers-'+$build.BuildId.Substring(0,12))
 if(Test-Path -LiteralPath $output){throw 'Installer output already exists. Choose a fresh build or move the prior output aside.'}
