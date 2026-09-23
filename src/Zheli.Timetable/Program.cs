@@ -15,6 +15,6 @@ public static class Program
 public sealed class TimetableApp:Application
 {
     private Window? _window;
-    public TimetableApp()=>Resources.MergedDictionaries.Add(new XamlControlsResources());
+    public TimetableApp(){Zheli.DesignSystem.StartupDiagnostics.Attach(this);Resources.MergedDictionaries.Add(new XamlControlsResources());}
     protected override void OnLaunched(LaunchActivatedEventArgs args){_window=new TimetableWindow();Zheli.DesignSystem.AppActivation.Bind(_window);_window.Activate();}
 }

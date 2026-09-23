@@ -15,6 +15,6 @@ public static class Program
 public sealed class MiaoApp:Application
 {
     private Window? _window;
-    public MiaoApp()=>Resources.MergedDictionaries.Add(new XamlControlsResources());
+    public MiaoApp(){Zheli.DesignSystem.StartupDiagnostics.Attach(this);Resources.MergedDictionaries.Add(new XamlControlsResources());}
     protected override void OnLaunched(LaunchActivatedEventArgs args){var window=new MiaoWindow();_window=window;Zheli.DesignSystem.AppActivation.Bind(window,window.AcceptContext);_window.Activate();}
 }

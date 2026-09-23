@@ -7,6 +7,8 @@ if(Test-Path -LiteralPath $data){throw 'Existing user data detected. Installer s
 if(Test-Path 'HKCU:\Software\Zheli\Installed'){throw 'Existing installation detected. Test refused.'}
 $root=Split-Path $PSScriptRoot -Parent
 $logs=Join-Path $root 'artifacts/logs';New-Item -ItemType Directory -Force -Path $logs | Out-Null
+$env:ZHELI_STARTUP_DIAGNOSTICS=$logs
+$testStarted=Get-Date
 $target=Join-Path $env:RUNNER_TEMP ('Zheli-install-smoke-'+[Guid]::NewGuid().ToString('N'))
 $build=Get-Content (Join-Path $InstallerDirectory 'build-info.json') -Raw | ConvertFrom-Json
 $count=0
@@ -74,4 +76,15 @@ try {
     Require ((-not(Exists 'Zheli.Settings')) -and (-not(Exists 'Zheli.CoreHost'))) 'last common-service uninstall removes programs'
     Require ((Get-Content $canary -Raw).Trim() -eq 'preserve user data') 'all uninstalls preserve user data'
     Write-Host 'PASS installer smoke suite. Visual quality, full IPC flows and personal-machine acceptance remain separate.'
-} finally {Stop-TestProcesses;Stop-Transcript | Out-Null}
+} finally {
+    Stop-TestProcesses
+    Get-ChildItem -LiteralPath $logs -Filter 'startup-*.txt' -File | ForEach-Object {Get-Content -LiteralPath $_.FullName | Write-Host}
+    try {
+        Get-WinEvent -FilterHashtable @{LogName='Application';StartTime=$testStarted} -ErrorAction Stop |
+            Where-Object {$_.ProviderName -in @('.NET Runtime','Application Error','Windows Error Reporting')} |
+            Select-Object TimeCreated,ProviderName,Id,Message | ConvertTo-Json -Depth 4 |
+            Set-Content (Join-Path $logs 'startup-windows-events.json') -Encoding utf8
+    } catch {Write-Host 'No matching application events available.'}
+    Remove-Item Env:\ZHELI_STARTUP_DIAGNOSTICS -ErrorAction SilentlyContinue
+    Stop-Transcript | Out-Null
+}

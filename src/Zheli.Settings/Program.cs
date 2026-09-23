@@ -15,6 +15,6 @@ public static class Program
 public sealed class SettingsApp:Application
 {
     private Window? _window;
-    public SettingsApp()=>Resources.MergedDictionaries.Add(new XamlControlsResources());
+    public SettingsApp(){Zheli.DesignSystem.StartupDiagnostics.Attach(this);Resources.MergedDictionaries.Add(new XamlControlsResources());}
     protected override void OnLaunched(LaunchActivatedEventArgs args){_window=new SettingsWindow();Zheli.DesignSystem.AppActivation.Bind(_window);_window.Activate();}
 }
