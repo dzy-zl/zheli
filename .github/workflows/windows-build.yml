@@ -24,6 +24,31 @@ jobs:
           pwsh -NoProfile -File ./tests/Packaging.Tests.ps1
           if ($LASTEXITCODE -ne 0) { throw 'Packaging checks failed.' }
           ./scripts/build-windows.ps1
+      - name: Validate native startup before packaging
+        shell: pwsh
+        run: |
+          $env:ZHELI_STARTUP_DIAGNOSTICS = Join-Path $PWD 'artifacts/logs'
+          $started = Get-Date
+          $root = Join-Path $PWD 'artifacts/win-x64'
+          $app = Join-Path $root 'Zheli.Settings/Zheli.Settings.exe'
+          try {
+            $process = Start-Process $app -WorkingDirectory (Split-Path $app) -PassThru
+            $deadline = (Get-Date).AddSeconds(30)
+            do {
+              Start-Sleep -Milliseconds 250
+              $process.Refresh()
+              if ($process.HasExited) { throw "Settings startup failed: $($process.ExitCode)" }
+            } while ($process.MainWindowHandle -eq 0 -and (Get-Date) -lt $deadline)
+            if ($process.MainWindowHandle -eq 0) { throw 'Settings window did not appear.' }
+            Start-Sleep -Seconds 3
+            $process.Refresh()
+            if ($process.HasExited) { throw 'Settings exited after creating a window.' }
+          } finally {
+            Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Path -and $_.Path.StartsWith($root + '\', [StringComparison]::OrdinalIgnoreCase) } | Stop-Process -Force -ErrorAction SilentlyContinue
+            Get-ChildItem artifacts/logs -Filter 'startup-*.txt' | ForEach-Object { Get-Content $_.FullName | Write-Host }
+            Get-WinEvent -FilterHashtable @{ LogName='Application'; StartTime=$started } -ErrorAction SilentlyContinue | Where-Object { $_.ProviderName -in @('.NET Runtime','Application Error','Windows Error Reporting') } | Select-Object ProviderName,Id,Message | Format-List | Out-String | Write-Host
+            Remove-Item Env:\ZHELI_STARTUP_DIAGNOSTICS -ErrorAction SilentlyContinue
+          }
       - name: Install checksum-pinned installer compiler
         shell: pwsh
         run: ./scripts/install-inno-compiler.ps1
