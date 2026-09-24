@@ -1,5 +1,10 @@
 # 依赖、字体与素材
 
+## 本轮新增：Fluent UI System Icons
+
+课表的“本周、添加课程、搜索”图标来自 [Microsoft Fluent UI System Icons](https://github.com/microsoft/fluentui-system-icons)，分别对应 `assets/Calendar/SVG/ic_fluent_calendar_24_regular.svg`、`assets/Add/SVG/ic_fluent_add_24_regular.svg`、`assets/Search/SVG/ic_fluent_search_24_regular.svg`。使用原图路径，填充色由 `#212121` 调整为 `#8298B2`。上游 MIT 版权与全文保存在 `src/Zheli.DesignSystem/Assets/Fluent/LICENSE`，发布时与资源一起复制。其他依赖许可仍逐项核对，不能把整个程序概括为 MIT。
+
+
 ## 0.2.3 安装器资源
 
 Inno Setup 固定为 6.5.4，编译器来自 `jrsoftware/issrc` 官方 GitHub release，下载 SHA-256 固定为 `fa73bf47a4da250d185d07561c2bfda387e5e20db77e4570004cf6a133cc10b1`。安装器编译器不包含在源码包中。
