@@ -52,9 +52,9 @@ public sealed class TimetableWindow:ShellWindow
         AddGlobalNavigation();
         Toolbar.Children.Add(Ui.Button("‹",()=>Guard(()=>ChangeWeek(-1))));Toolbar.Children.Add(_weekLabel);
         Toolbar.Children.Add(Ui.Button("›",()=>Guard(()=>ChangeWeek(1))));
-        Toolbar.Children.Add(Ui.Button("本周",()=>Guard(()=>GoToday())));
-        Toolbar.Children.Add(Ui.Button("＋ 添加课程",()=>Guard(()=>EditCourse(null,1,1))));
-        Toolbar.Children.Add(Ui.Button("搜索",()=>Guard(OpenSearch)));
+        Toolbar.Children.Add(Ui.IconButton("本周","Calendar",()=>Guard(()=>GoToday())));
+        Toolbar.Children.Add(Ui.IconButton("添加课程","Add",()=>Guard(()=>EditCourse(null,1,1))));
+        Toolbar.Children.Add(Ui.IconButton("搜索","Search",()=>Guard(OpenSearch)));
         Toolbar.Children.Add(Ui.Button("哲喵",()=>Guard(OpenMiao)));
         Toolbar.Children.Add(Ui.Button("撤销",()=>Guard(Undo)));
         Toolbar.Children.Add(Ui.Button("刷新",()=>Guard(Refresh)));
