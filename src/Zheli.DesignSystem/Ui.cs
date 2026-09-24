@@ -42,10 +42,21 @@ public static class Ui
         var button=Button(label,action);
         var row=new StackPanel {Orientation=Orientation.Horizontal,Spacing=6,VerticalAlignment=VerticalAlignment.Center};
         var path=Path.Combine(AppContext.BaseDirectory,"Assets","Fluent",icon+".svg");
-        row.Children.Add(new Image {Source=new Microsoft.UI.Xaml.Media.Imaging.SvgImageSource(new Uri(path)),Width=18,Height=18});
+        var source=new Microsoft.UI.Xaml.Media.Imaging.SvgImageSource();
+        row.Children.Add(new Image {Source=source,Width=18,Height=18});
         row.Children.Add(Text(label,14));
         button.Content=row;
+        _=LoadIconAsync(source,path);
         return button;
+    }
+    private static async Task LoadIconAsync(Microsoft.UI.Xaml.Media.Imaging.SvgImageSource source,string path)
+    {
+        try
+        {
+            using var stream=await Windows.Storage.Streams.FileRandomAccessStream.OpenAsync(path,Windows.Storage.FileAccessMode.Read);
+            await source.SetSourceAsync(stream);
+        }
+        catch { /* the button keeps its visible text if the optional icon cannot load */ }
     }
     public static TextBox Input(string header,string text="") => new()
     { Header=header,Text=text,FontFamily=Font,FontSize=14*_textScale,MinWidth=120,HorizontalAlignment=HorizontalAlignment.Stretch };
