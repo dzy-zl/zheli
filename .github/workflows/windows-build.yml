@@ -65,11 +65,25 @@ jobs:
           $directory = @(Get-ChildItem artifacts -Directory -Filter 'installers-*')
           if ($directory.Count -ne 1) { throw 'Expected exactly one installer build.' }
           ./scripts/test-installers-windows.ps1 -InstallerDirectory $directory[0].FullName
-      - name: Upload tested unsigned installers
+      - name: Upload tested Settings installer
         uses: actions/upload-artifact@v4
         with:
-          name: Zheli-Windows-x64-Test-Installers
-          path: artifacts/installers-*/
+          name: Zheli-Settings-win-x64-Test-Installer
+          path: artifacts/installers-*/Zheli-Settings-*-win-x64-Setup.exe
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload tested Timetable installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Zheli-Timetable-win-x64-Test-Installer
+          path: artifacts/installers-*/Zheli-Timetable-*-win-x64-Setup.exe
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload tested Miao installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Zheli-Miao-win-x64-Test-Installer
+          path: artifacts/installers-*/Zheli-Miao-*-win-x64-Setup.exe
           if-no-files-found: error
           retention-days: 14
       - name: Upload build and installer diagnostics
