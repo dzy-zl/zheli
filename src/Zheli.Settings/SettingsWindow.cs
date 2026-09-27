@@ -141,7 +141,7 @@ public sealed class SettingsWindow:ShellWindow
                     await Save(p=>p with{KnowledgeFolders=p.KnowledgeFolders.Where(f=>f.Id!=folder.Id).ToList()});await ShowKnowledge();
                 })))));
         }
-        Page("文件知识库",list,Ui.Text("关闭目录读取会同时阻止其他授权读取该目录；移除该条目后父目录规则重新适用。私密子目录优先于父目录的云端授权。哲喵完整窗口提供单文件改名、移动与可恢复删除。索引、恢复副本和既有本地会话不加密，清理索引不等于安全擦除磁盘。",12));
+        Page("文件知识库",list,Ui.Text("关闭目录读取会同时阻止其他授权读取该目录；移除该条目后父目录规则重新适用。私密子目录优先于父目录的云端授权。哲喵完整窗口提供单文件改名、移动、可恢复删除及 UTF-8 文本编辑。索引、恢复副本和既有本地会话不加密，清理索引不等于安全擦除磁盘。",12));
     }
     private async Task AddKnowledgeFolder()
     {

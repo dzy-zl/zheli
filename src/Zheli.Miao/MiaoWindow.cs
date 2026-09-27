@@ -306,7 +306,7 @@ public sealed class MiaoWindow:ShellWindow
         EnsureIdle();
         _files.Expire(DateTimeOffset.UtcNow);
         var list=Ui.Stack(Ui.Row(Ui.Button("返回对话",()=>Workspace.Content=_chatGrid),Ui.Text("文件操作与撤销",24,true)),
-            Ui.Text("选择当前 Windows 账户可访问的单个文件。先创建完整恢复副本，再执行改名、移动或可恢复删除。恢复副本保留 30 天；文件被后续修改时，撤销会保留当前版本并恢复旧版本。"));
+            Ui.Text("选择当前 Windows 账户可访问的单个文件。先创建完整恢复副本，再执行改名、移动、可恢复删除或 UTF-8 文本编辑。恢复副本保留 30 天；文件被后续修改时，撤销会保留当前版本并恢复旧版本。"));
         var selected=Ui.Text(_selectedFile??"尚未选择文件",12);
         list.Children.Add(Ui.Card(Ui.Stack(selected,
             Ui.Button("选择文件",()=>Guard(async()=>
@@ -338,15 +338,25 @@ public sealed class MiaoWindow:ShellWindow
                 if(!await Confirm("可恢复删除文件？",$"{source}\n\n将删除原文件并保留 30 天恢复副本。"))return;
                 await _files.Execute(FileActionKind.Delete,source,null);_selectedFile=null;
                 Status.Text="已删除文件并保存 30 天恢复副本。";await ShowFileActions();
-            }))))));
+            }))),
+            Ui.Button("编辑 UTF-8 文本",()=>Guard(async()=>
+            {
+                var source=_selectedFile??throw new InvalidOperationException("请先选择 TXT 或 Markdown 文件。");
+                var previous=_files.ReadEditableText(source);
+                var editor=Ui.Input("文本内容 · 最多 512 KiB",previous.Text);
+                editor.AcceptsReturn=true;editor.TextWrapping=TextWrapping.Wrap;editor.MinHeight=260;editor.MaxHeight=400;
+                if(!await Form("编辑文本并保存 30 天恢复副本",editor,"保存更改")||editor.Text==previous.Text)return;
+                await _files.EditText(source,previous.Sha256,editor.Text);
+                Status.Text="文本已保存；30 天内可从操作记录撤销。";await ShowFileActions();
+            }))));
         list.Children.Add(Ui.Text("最近操作",19,true));
         foreach(var action in _files.History().Take(50))
         {
-            var kind=action.Kind switch{FileActionKind.Rename=>"改名",FileActionKind.Move=>"移动",_=>"可恢复删除"};
+            var kind=action.Kind switch{FileActionKind.Rename=>"改名",FileActionKind.Move=>"移动",FileActionKind.Edit=>"文本编辑",_=>"可恢复删除"};
             var state=action.Status switch{FileActionStatus.Prepared=>"准备中",FileActionStatus.Complete=>"可撤销",FileActionStatus.Undone=>"已恢复",FileActionStatus.Expired=>"已到期",_=>"需检查"};
             var line=Ui.Stack(Ui.Text($"{kind} · {Path.GetFileName(action.Source)}",14,true),
                 Ui.Text($"{action.Created.ToLocalTime():g} · {state} · 恢复期限 {action.Expires.ToLocalTime():g}",12),
-                Ui.Text(action.Target??"可恢复删除",12));
+                Ui.Text(action.Target??(action.Kind==FileActionKind.Edit?"原文件内容": "可恢复删除"),12));
             if(action.Status==FileActionStatus.Complete && action.Expires>DateTimeOffset.UtcNow)
                 line.Children.Add(Ui.Button("撤销此操作",()=>Guard(async()=>
                 {

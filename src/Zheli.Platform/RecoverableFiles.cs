@@ -1,13 +1,14 @@
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using Zheli.Storage;
 
 namespace Zheli.Platform;
 
-public enum FileActionKind { Rename, Move, Delete }
+public enum FileActionKind { Rename, Move, Delete, Edit }
 public enum FileActionStatus { Prepared, Complete, Undone, Expired, NeedsReview }
 public sealed record FileAction(string Id,FileActionKind Kind,string Source,string? Target,string Backup,string Sha256,
-    DateTimeOffset Created,DateTimeOffset Expires,FileActionStatus Status,string? RestoredTo=null);
+    DateTimeOffset Created,DateTimeOffset Expires,FileActionStatus Status,string? RestoredTo=null,string? ResultSha256=null);
 public sealed record FileActionState
 {
     public List<FileAction> Actions { get; init; }=[];
@@ -26,11 +27,41 @@ public sealed class RecoverableFiles
         _store=new DocumentStore<FileActionState>(Path.Combine(_root,"file-actions.db"));
     }
     public IReadOnlyList<FileAction> History()=>_store.Read().Data.Actions.OrderByDescending(x=>x.Created).ToList();
-    public async Task<FileAction> Execute(FileActionKind kind,string source,string? target,CancellationToken ct=default)
+    public Task<FileAction> Execute(FileActionKind kind,string source,string? target,CancellationToken ct=default)
+    {
+        if(kind is not (FileActionKind.Rename or FileActionKind.Move or FileActionKind.Delete))throw new ArgumentException("请使用受支持的文件操作入口。");
+        return ExecuteCore(kind,source,target,null,null,ct);
+    }
+    public (string Text,string Sha256) ReadEditableText(string source)
     {
         source=FilePath(source);
-        if(kind==FileActionKind.Delete && target!=null)throw new ArgumentException("删除文件不需要目标路径。");
-        if(kind!=FileActionKind.Delete)
+        if(Path.GetExtension(source).ToLowerInvariant() is not (".txt" or ".md"))throw new IOException("仅支持 UTF-8 的 TXT 和 Markdown 文件。");
+        if((File.GetAttributes(source)&FileAttributes.ReparsePoint)!=0)throw new IOException("暂不处理符号链接或重解析点。");
+        if(new FileInfo(source).Length>512*1024)throw new IOException("文本文件超过 512 KiB 编辑限制。");
+        var bytes=File.ReadAllBytes(source);
+        if(bytes.Length>512*1024)throw new IOException("文本文件超过 512 KiB 编辑限制。");
+        var bom=bytes.AsSpan().StartsWith(Encoding.UTF8.GetPreamble());
+        var content=new UTF8Encoding(false,true).GetString(bytes,bom?3:0,bytes.Length-(bom?3:0));
+        if(content.Contains('\0'))throw new IOException("文本包含空字符，无法作为 UTF-8 文本编辑。");
+        return(content,Convert.ToHexString(SHA256.HashData(bytes)));
+    }
+    public Task<FileAction> EditText(string source,string expectedSha256,string replacement,CancellationToken ct=default)
+    {
+        var old=ReadEditableText(source);
+        if(old.Sha256!=expectedSha256)throw new IOException("文件已被其他程序修改；请重新打开后再编辑。");
+        if(replacement.Contains('\0'))throw new IOException("编辑内容不能包含空字符。");
+        if(replacement.Length>512*1024)throw new IOException("编辑后的文本超过 512 KiB 限制。");
+        var bom=File.ReadAllBytes(source).AsSpan().StartsWith(Encoding.UTF8.GetPreamble());
+        var content=new UTF8Encoding(false,true).GetBytes(replacement);
+        if(content.Length>512*1024)throw new IOException("编辑后的文本超过 512 KiB 限制。");
+        var bytes=bom?Encoding.UTF8.GetPreamble().Concat(content).ToArray():content;
+        return ExecuteCore(FileActionKind.Edit,source,null,bytes,expectedSha256,ct);
+    }
+    private async Task<FileAction> ExecuteCore(FileActionKind kind,string source,string? target,byte[]? replacement,string? expectedSha,CancellationToken ct)
+    {
+        source=FilePath(source);
+        if((kind is FileActionKind.Delete or FileActionKind.Edit)&&target!=null)throw new ArgumentException("该操作不需要目标路径。");
+        if(kind is FileActionKind.Rename or FileActionKind.Move)
         {
             if(string.IsNullOrWhiteSpace(target))throw new ArgumentException("缺少目标路径。");
             target=FilePath(target);
@@ -55,6 +86,7 @@ public sealed class RecoverableFiles
             var current=new FileInfo(source);
             if(current.Length!=initial.Length||current.LastWriteTimeUtc!=initial.LastWriteTimeUtc||await Hash(source,ct)!=hash)
                 throw new IOException("备份时原文件发生变化；未执行操作。");
+            if(expectedSha!=null&&hash!=expectedSha)throw new IOException("文件已被其他程序修改；请重新打开后再编辑。");
         }
         catch
         {
@@ -64,13 +96,25 @@ public sealed class RecoverableFiles
             throw;
         }
         var now=DateTimeOffset.UtcNow;
-        var prepared=new FileAction(id,kind,source,target,backup,hash,now,now.AddDays(30),FileActionStatus.Prepared);
+        var prepared=new FileAction(id,kind,source,target,backup,hash,now,now.AddDays(30),FileActionStatus.Prepared,
+            ResultSha256=replacement==null?null:Convert.ToHexString(SHA256.HashData(replacement)));
         try{Update(s=>s with{Actions=s.Actions.Prepend(prepared).ToList()},"准备文件操作");}
         catch{Directory.Delete(directory,true);throw;}
         try
         {
             ct.ThrowIfCancellationRequested();
             if(kind==FileActionKind.Delete)File.Delete(source);
+            else if(kind==FileActionKind.Edit)
+            {
+                var staged=Path.Combine(Path.GetDirectoryName(source)!,"."+Path.GetFileName(source)+".zheli-"+id+".part");
+                try
+                {
+                    await File.WriteAllBytesAsync(staged,replacement!,ct);
+                    if(await Hash(source,ct)!=hash)throw new IOException("编辑前原文件发生变化；未替换内容。");
+                    File.Replace(staged,source,null);
+                }
+                finally{if(File.Exists(staged))File.Delete(staged);}
+            }
             else File.Move(source,target!);
             return UpdateOne(id,a=>a with{Status=FileActionStatus.Complete},"完成文件操作");
         }
@@ -88,6 +132,19 @@ public sealed class RecoverableFiles
         if(action.Status!=FileActionStatus.Complete||DateTimeOffset.UtcNow>=action.Expires)throw new InvalidOperationException("这条操作已无法自动撤销。");
         if(!File.Exists(action.Backup)||await Hash(action.Backup,ct)!=action.Sha256)
             throw new IOException("恢复副本缺失或校验失败；未修改当前文件。");
+        if(action.Kind==FileActionKind.Edit)
+        {
+            if(File.Exists(action.Source)&&action.ResultSha256!=null&&await Hash(action.Source,ct)==action.ResultSha256)
+            {
+                var staged=await StageBackup(action,action.Source,ct);
+                try{File.Replace(staged,action.Source,null);}
+                finally{if(File.Exists(staged))File.Delete(staged);}
+                return UpdateOne(id,a=>a with{Status=FileActionStatus.Undone,RestoredTo=action.Source},"撤销文本编辑");
+            }
+            var alternative=UniqueRestorePath(action.Source);
+            await RestoreBackup(action,alternative,ct);
+            return UpdateOne(id,a=>a with{Status=FileActionStatus.Undone,RestoredTo=alternative},"恢复编辑前版本");
+        }
         var restored=UniqueRestorePath(action.Source);
         var canMoveTarget=action.Kind!=FileActionKind.Delete&&action.Target!=null&&File.Exists(action.Target)
             &&restored==action.Source&&await Hash(action.Target,ct)==action.Sha256;
@@ -143,7 +200,7 @@ public sealed class RecoverableFiles
         }
         throw new IOException("没有可用的恢复文件名。");
     }
-    private static async Task RestoreBackup(FileAction action,string destination,CancellationToken ct)
+    private static async Task<string> StageBackup(FileAction action,string destination,CancellationToken ct)
     {
         // Stage next to the destination; a partial copy is never published as
         // the restored file. The recovery original remains available on failure.
@@ -151,8 +208,14 @@ public sealed class RecoverableFiles
         try
         {
             if(await CopyAndHash(action.Backup,temp,ct)!=action.Sha256)throw new IOException("恢复副本在复制时发生变化。");
-            File.Move(temp,destination);
+            return temp;
         }
+        catch{if(File.Exists(temp))File.Delete(temp);throw;}
+    }
+    private static async Task RestoreBackup(FileAction action,string destination,CancellationToken ct)
+    {
+        var temp=await StageBackup(action,destination,ct);
+        try{File.Move(temp,destination);}
         finally{if(File.Exists(temp))File.Delete(temp);}
     }
     private FileAction UpdateOne(string id,Func<FileAction,FileAction> change,string summary)
