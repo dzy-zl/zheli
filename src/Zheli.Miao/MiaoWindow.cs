@@ -343,8 +343,15 @@ public sealed class MiaoWindow:ShellWindow
                     var undone=await _files.Undo(action.Id);
                     Status.Text="已恢复："+undone.RestoredTo;await ShowFileActions();
                 })));
-            if(action.Status==FileActionStatus.NeedsReview)
-                line.Children.Add(Ui.Text("操作中断，恢复副本已保留；请核对原文件和目标文件后处理。",12));
+            if((action.Status is FileActionStatus.NeedsReview or FileActionStatus.Prepared) && action.Expires>DateTimeOffset.UtcNow)
+            {
+                line.Children.Add(Ui.Text("操作中断；请先核对原文件和目标文件。可将恢复副本另存到原目录，不会覆盖现有文件。",12));
+                line.Children.Add(Ui.Button("恢复副本",()=>Guard(async()=>
+                {
+                    var restored=await _files.RestoreCopy(action.Id);
+                    Status.Text="恢复副本已存到："+restored.RestoredTo;await ShowFileActions();
+                })));
+            }
             list.Children.Add(Ui.Card(line));
         }
         Workspace.Content=Ui.Scroll(list);

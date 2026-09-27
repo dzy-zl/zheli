@@ -57,7 +57,7 @@ public sealed class QuickPanelWindow : Window
         _status=new TextBlock{Text="快捷对话 · 本地保存",FontSize=11,Margin=new Thickness(0,3,0,0)};labels.Children.Add(_status);
         var buttons=new StackPanel{Orientation=Orientation.Horizontal};Grid.SetColumn(buttons,2);header.Children.Add(buttons);
         buttons.Children.Add(HeaderButton("⤢","打开完整窗口",()=>{Hide();_openFull();}));
-        buttons.Children.Add(HeaderButton("×","收起面板",Hide));
+        buttons.Children.Add(HeaderButton("×","收起面板",StopAndHide));
         layout.Children.Add(header);
         _messages=new StackPanel{Margin=new Thickness(18,10,18,12)};
         _scroll=new ScrollViewer{Content=_messages,VerticalScrollBarVisibility=ScrollBarVisibility.Auto,HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled};
@@ -92,7 +92,7 @@ public sealed class QuickPanelWindow : Window
         _title.Foreground=Foreground;_status.Foreground=new SolidColorBrush(dark?Color.FromRgb(170,194,208):Color.FromRgb(105,132,147));
         _input.Background=new SolidColorBrush(dark?Color.FromRgb(45,65,80):Colors.White);
         _input.Foreground=Foreground;_input.BorderBrush=_surface.BorderBrush;
-        Refresh();
+        if(_sending==null)Refresh();
     }
 
     private Button HeaderButton(string symbol,string hint,Action action)
@@ -103,6 +103,7 @@ public sealed class QuickPanelWindow : Window
     }
     private void Refresh()
     {
+        if(_sending!=null)return;
         _messages.Children.Clear();
         try
         {
@@ -167,7 +168,7 @@ public sealed class QuickPanelWindow : Window
             var prefs=(await _core.Call<Snapshot<Preferences>>("settings.read",ct:_sending.Token)).Data;
             if(string.IsNullOrWhiteSpace(prefs.Model)||CredentialVault.Get()==null)
                 throw new InvalidOperationException("请先在哲里设置中配置密钥并选择模型。");
-            Persist("user",question);Refresh();
+            Persist("user",question);AddBubble(question,true);
             var reply=AddBubble("",false);_status.Text="正在回复…";
             var state=_store.Read().Data.Conversations.Single(c=>c.Id==_conversationId);
             var messages=state.Messages.Where(m=>!m.LocalOnly).TakeLast(20).Select(m=>new ChatMessage(m.Role,m.Text)).ToList();
@@ -180,7 +181,7 @@ public sealed class QuickPanelWindow : Window
         catch(DeepSeekException e){_status.Text=e.Message;Refresh();}
         catch(Exception e)when(e is InvalidOperationException or IOException or StoreException or JsonException or UnauthorizedAccessException)
         {_status.Text=e.Message;Refresh();}
-        finally{_sending?.Dispose();_sending=null;_input.IsEnabled=true;_send.IsEnabled=true;_input.Focus();}
+        finally{_sending?.Dispose();_sending=null;Refresh();_input.IsEnabled=true;_send.IsEnabled=true;_input.Focus();}
     }
     public void StopAndHide(){_sending?.Cancel();Hide();}
 }

@@ -93,13 +93,27 @@ public sealed class RecoverableFiles
             &&restored==action.Source&&await Hash(action.Target,ct)==action.Sha256;
         ct.ThrowIfCancellationRequested();
         if(canMoveTarget)File.Move(action.Target!,restored);
-        else File.Copy(action.Backup,restored,false);
+        else await RestoreBackup(action,restored,ct);
         // When the target has changed, leave it untouched and restore the old bytes separately.
         return UpdateOne(id,a=>a with{Status=FileActionStatus.Undone,RestoredTo=restored},"撤销文件操作");
     }
+    // A crash can leave a prepared or uncertain action. Restore the verified
+    // recovery bytes alongside existing files, without guessing which file is current.
+    public async Task<FileAction> RestoreCopy(string id,CancellationToken ct=default)
+    {
+        var action=_store.Read().Data.Actions.SingleOrDefault(x=>x.Id==id)??throw new FileNotFoundException("操作记录不存在。");
+        if(action.Status is not (FileActionStatus.Prepared or FileActionStatus.NeedsReview)||DateTimeOffset.UtcNow>=action.Expires)
+            throw new InvalidOperationException("这条操作已无法恢复副本。");
+        if(!File.Exists(action.Backup)||await Hash(action.Backup,ct)!=action.Sha256)
+            throw new IOException("恢复副本缺失或校验失败；未修改当前文件。");
+        var restored=UniqueRestorePath(action.Source);
+        ct.ThrowIfCancellationRequested();
+        await RestoreBackup(action,restored,ct);
+        return UpdateOne(id,a=>a with{Status=FileActionStatus.Undone,RestoredTo=restored},"从中断操作恢复副本");
+    }
     public int Expire(DateTimeOffset now)
     {
-        var expired=_store.Read().Data.Actions.Where(a=>a.Expires<=now&&a.Status is FileActionStatus.Complete or FileActionStatus.Undone).ToList();
+        var expired=_store.Read().Data.Actions.Where(a=>a.Expires<=now&&a.Status!=FileActionStatus.Expired).ToList();
         foreach(var action in expired)
         {
             // Expiration only removes our copy. The user's files remain in place.
@@ -128,6 +142,18 @@ public sealed class RecoverableFiles
             if(!File.Exists(path)&&!Directory.Exists(path))return path;
         }
         throw new IOException("没有可用的恢复文件名。");
+    }
+    private static async Task RestoreBackup(FileAction action,string destination,CancellationToken ct)
+    {
+        // Stage next to the destination; a partial copy is never published as
+        // the restored file. The recovery original remains available on failure.
+        var temp=Path.Combine(Path.GetDirectoryName(destination)!,"."+Path.GetFileName(destination)+".zheli-"+Guid.NewGuid().ToString("N")+".part");
+        try
+        {
+            if(await CopyAndHash(action.Backup,temp,ct)!=action.Sha256)throw new IOException("恢复副本在复制时发生变化。");
+            File.Move(temp,destination);
+        }
+        finally{if(File.Exists(temp))File.Delete(temp);}
     }
     private FileAction UpdateOne(string id,Func<FileAction,FileAction> change,string summary)
     {
