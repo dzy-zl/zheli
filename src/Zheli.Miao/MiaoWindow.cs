@@ -30,6 +30,9 @@ public sealed class MiaoWindow:ShellWindow
     private CancellationTokenSource? _sending;
     private ChatContext? _context;
     private readonly KnowledgeIndex _knowledge=new(Path.Combine(AppPaths.DataRoot,"Miao","knowledge.db"));
+    private readonly RecoverableFiles _files=new(Path.Combine(AppPaths.DataRoot,"Miao","recovery"));
+    private readonly Grid _chatGrid=new(){RowSpacing=10};
+    private string? _selectedFile;
     private readonly DispatcherTimer _indexTimer=new(){Interval=TimeSpan.FromMinutes(1)};
     private readonly CancellationTokenSource _lifetime=new();
     private CancellationTokenSource? _indexWork;
@@ -45,9 +48,10 @@ public sealed class MiaoWindow:ShellWindow
         Toolbar.Children.Add(Ui.Button("显示桌宠",()=>Guard(()=>{AppPaths.Launch("Zheli.PetHost");return Task.CompletedTask;})));
         Nav("新建会话",()=>Guard(()=>{EnsureIdle();NewConversation();return Task.CompletedTask;}));
         Nav("回收站",()=>Guard(Trash));
+        Nav("文件操作与撤销",()=>Guard(ShowFileActions));
         Nav("哲里设置",()=>Guard(()=>{AppPaths.Launch("Zheli.Settings");return Task.CompletedTask;}));
         Navigation.Children.Add(_conversationList);
-        var grid=new Grid{RowSpacing=10};grid.RowDefinitions.Add(new(){Height=GridLength.Auto});grid.RowDefinitions.Add(new(){Height=new GridLength(1,GridUnitType.Star)});grid.RowDefinitions.Add(new(){Height=GridLength.Auto});
+        var grid=_chatGrid;grid.RowDefinitions.Add(new(){Height=GridLength.Auto});grid.RowDefinitions.Add(new(){Height=new GridLength(1,GridUnitType.Star)});grid.RowDefinitions.Add(new(){Height=GridLength.Auto});
         var context=Ui.Stack(Ui.Row(_contextLabel,Ui.Button("清除上下文",()=>Guard(()=>{EnsureIdle();_context=null;_lastCourses=[];_sendCourse.IsChecked=false;_lastFileHits=[];_sendFiles.IsChecked=false;_contextLabel.Text="无应用上下文";return Task.CompletedTask;}))),
             Ui.Row(Ui.Button("明天课程",()=>Guard(QueryTomorrow)),Ui.Button("本周课程",()=>Guard(QueryWeek)),Ui.Button("本地文件搜索",()=>Guard(SearchFiles))),
             Ui.Row(Ui.Button("调整所选课程",()=>Guard(ChangeSelected)),
@@ -288,6 +292,63 @@ public sealed class MiaoWindow:ShellWindow
             Add("assistant",text,true);Status.Text=$"本地检索完成 · 更新{result.Index.Updated}份 · 复用{result.Index.Reused}份 · 未发送云端";
         }
         finally{_indexing=false;_indexWork.Dispose();_indexWork=null;}
+    }
+    private Task ShowFileActions()
+    {
+        EnsureIdle();
+        _files.Expire(DateTimeOffset.UtcNow);
+        var list=Ui.Stack(Ui.Row(Ui.Button("返回对话",()=>Workspace.Content=_chatGrid),Ui.Text("文件操作与撤销",24,true)),
+            Ui.Text("选择当前 Windows 账户可访问的单个文件。先创建完整恢复副本，再执行改名、移动或可恢复删除。恢复副本保留 30 天；文件被后续修改时，撤销会保留当前版本并恢复旧版本。"));
+        var selected=Ui.Text(_selectedFile??"尚未选择文件",12);
+        list.Children.Add(Ui.Card(Ui.Stack(selected,
+            Ui.Button("选择文件",()=>Guard(async()=>
+            {
+                var picker=new FileOpenPicker();picker.FileTypeFilter.Add("*");
+                WinRT.Interop.InitializeWithWindow.Initialize(picker,WinRT.Interop.WindowNative.GetWindowHandle(this));
+                var picked=await picker.PickSingleFileAsync();if(picked==null)return;
+                _selectedFile=picked.Path;selected.Text=_selectedFile;
+            })),
+            Ui.Row(Ui.Button("改名",()=>Guard(async()=>
+            {
+                var source=_selectedFile??throw new InvalidOperationException("请先选择文件。");
+                var name=Ui.Input("新文件名（包括扩展名）",Path.GetFileName(source));
+                if(!await Form("改名并保存恢复副本",name,"执行改名"))return;
+                if(string.IsNullOrWhiteSpace(name.Text)||Path.GetFileName(name.Text)!=name.Text||name.Text is "." or "..")throw new InvalidOperationException("请输入不包含路径分隔符的文件名。");
+                var changed=await _files.Execute(FileActionKind.Rename,source,Path.Combine(Path.GetDirectoryName(source)!,name.Text));
+                _selectedFile=changed.Target;Status.Text="改名成功；30 天内可撤销。";await ShowFileActions();
+            })),Ui.Button("移动",()=>Guard(async()=>
+            {
+                var source=_selectedFile??throw new InvalidOperationException("请先选择文件。");
+                var picker=new FolderPicker();picker.FileTypeFilter.Add("*");
+                WinRT.Interop.InitializeWithWindow.Initialize(picker,WinRT.Interop.WindowNative.GetWindowHandle(this));
+                var folder=await picker.PickSingleFolderAsync();if(folder==null)return;
+                var changed=await _files.Execute(FileActionKind.Move,source,Path.Combine(folder.Path,Path.GetFileName(source)));
+                _selectedFile=changed.Target;Status.Text="移动成功；30 天内可撤销。";await ShowFileActions();
+            })),Ui.Button("可恢复删除",()=>Guard(async()=>
+            {
+                var source=_selectedFile??throw new InvalidOperationException("请先选择文件。");
+                if(!await Confirm("可恢复删除文件？",$"{source}\n\n将删除原文件并保留 30 天恢复副本。"))return;
+                await _files.Execute(FileActionKind.Delete,source,null);_selectedFile=null;
+                Status.Text="已删除文件并保存 30 天恢复副本。";await ShowFileActions();
+            }))))));
+        list.Children.Add(Ui.Text("最近操作",19,true));
+        foreach(var action in _files.History().Take(50))
+        {
+            var line=Ui.Stack(Ui.Text($"{action.Kind} · {Path.GetFileName(action.Source)}",14,true),
+                Ui.Text($"{action.Created.ToLocalTime():g} · {action.Status} · 恢复期限 {action.Expires.ToLocalTime():g}",12),
+                Ui.Text(action.Target??"可恢复删除",12));
+            if(action.Status==FileActionStatus.Complete && action.Expires>DateTimeOffset.UtcNow)
+                line.Children.Add(Ui.Button("撤销此操作",()=>Guard(async()=>
+                {
+                    var undone=await _files.Undo(action.Id);
+                    Status.Text="已恢复："+undone.RestoredTo;await ShowFileActions();
+                })));
+            if(action.Status==FileActionStatus.NeedsReview)
+                line.Children.Add(Ui.Text("操作中断，恢复副本已保留；请核对原文件和目标文件后处理。",12));
+            list.Children.Add(Ui.Card(line));
+        }
+        Workspace.Content=Ui.Scroll(list);
+        return Task.CompletedTask;
     }
     private async Task RefreshKnowledge()
     {
