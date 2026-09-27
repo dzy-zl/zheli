@@ -110,7 +110,12 @@ public sealed class SettingsWindow:ShellWindow
         var info=Ui.Text(CredentialVault.Get()==null?"尚未配置密钥":"密钥已保存在Windows凭据管理器中");
         var controls=Ui.Stack(key,Ui.Row(Ui.Button("保存密钥",()=>Guard(()=>{CredentialVault.Set(key.Password);key.Password="";info.Text="密钥已保存";return Task.CompletedTask;})),
             Ui.Button("删除密钥",()=>Guard(async()=>{if(await Confirm("删除API密钥","本地课表与会话不会被删除。")){CredentialVault.Remove();info.Text="密钥已删除";}}))),info,
-            Ui.Button("连接并获取模型",()=>Guard(async()=>{using var client=new DeepSeekClient();model.ItemsSource=await client.Models();model.SelectedItem=_settings.Data.Model;Status.Text="连接成功，模型列表已更新。";})),model);
+            Ui.Button("连接并获取模型",()=>Guard(async()=>
+            {
+                using var client=new DeepSeekClient();var available=await client.Models();model.ItemsSource=available;
+                model.SelectedItem=available.Contains(_settings.Data.Model)?_settings.Data.Model:available.Contains("deepseek-flash")?"deepseek-flash":available[0];
+                Status.Text="连接成功，已选择可用模型。";
+            })),model);
         model.SelectionChanged+=(_,_)=>{if(model.SelectedItem is string id)Guard(()=>Save(p=>p with{Model=id}));};
         Page("哲喵与DeepSeek",Ui.Card(pet),Ui.Card(controls),Ui.Button("打开哲喵",()=>Guard(()=>{AppPaths.Launch("Zheli.Miao");return Task.CompletedTask;})),Ui.Text("密钥不写入配置、操作记录或备份；当前不支持语音。"));
     }

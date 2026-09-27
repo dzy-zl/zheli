@@ -1,10 +1,13 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 namespace Zheli.Platform;
 
 public sealed record ChatMessage(string Role,string Content);
+public sealed record DeepSeekToolCall(string Id,string Name,string Arguments);
+public sealed record DeepSeekToolDecision(string? Content,DeepSeekToolCall? Call);
 public enum DeepSeekFailure { Authentication, Balance, RateLimit, InvalidRequest, ModelUnavailable, Service, Network, Timeout, InvalidResponse, Filtered }
 public sealed class DeepSeekException(DeepSeekFailure failure,string message,HttpStatusCode? status=null) : Exception(message)
 {
@@ -51,7 +54,7 @@ public sealed class DeepSeekClient : IDisposable
         if(messages.Count is <1 or >100||messages.Any(m=>m.Role is not ("system" or "user" or "assistant")||string.IsNullOrWhiteSpace(m.Content))||messages.Sum(m=>(long)m.Content.Length)>512000)
             throw new ArgumentException("对话内容为空、过长或角色无效，请缩短内容或新建会话。");
         using var request=Request(HttpMethod.Post,"chat/completions");
-        request.Content=JsonContent.Create(new { model,messages=messages.Select(m=>new {role=m.Role,content=m.Content}),stream=false,max_tokens=maxTokens });
+        request.Content=JsonContent.Create(new { model,thinking=new {type="disabled"},messages=messages.Select(m=>new {role=m.Role,content=m.Content}),stream=false,max_tokens=maxTokens });
         using var doc=await Send(request,ct);
         if(!doc.RootElement.TryGetProperty("choices",out var choices)||choices.ValueKind!=JsonValueKind.Array||choices.GetArrayLength()==0)throw InvalidResponse();
         var first=choices[0];
@@ -61,6 +64,106 @@ public sealed class DeepSeekClient : IDisposable
         if(!first.TryGetProperty("message",out var message)||message.ValueKind!=JsonValueKind.Object||!message.TryGetProperty("content",out var content)||content.ValueKind!=JsonValueKind.String||string.IsNullOrWhiteSpace(content.GetString()))throw InvalidResponse();
         var answer=content.GetString()!;
         return reason=="length"?answer+"\n\n（回答达到本次输出上限，内容可能不完整。可缩小问题范围后继续提问。）":answer;
+    }
+    public async Task<DeepSeekToolDecision> SelectTimetableTool(string model,IReadOnlyList<ChatMessage> messages,CancellationToken ct)
+    {
+        Validate(model,messages);
+        using var request=Request(HttpMethod.Post,"chat/completions");
+        request.Content=JsonContent.Create(new
+        {
+            model,thinking=new {type="disabled"},stream=false,max_tokens=512,
+            messages=messages.Select(m=>new {role=m.Role,content=m.Content}),
+            tools=new[]{new {type="function",function=new
+            {
+                name="timetable_query",description="查询哲里课表中指定日期范围内的课程，仅在用户询问自己的课程时调用。日期必须为 yyyy-MM-dd，最多查询连续七天。",
+                parameters=new {type="object",properties=new
+                {
+                    from=new {type="string",description="开始日期 yyyy-MM-dd"},
+                    through=new {type="string",description="结束日期 yyyy-MM-dd"}
+                },required=new[]{"from","through"},additionalProperties=false}
+            }}},tool_choice="auto"
+        });
+        using var doc=await Send(request,ct);
+        if(!doc.RootElement.TryGetProperty("choices",out var choices)||choices.ValueKind!=JsonValueKind.Array||choices.GetArrayLength()!=1)throw InvalidResponse();
+        var choice=choices[0];
+        if(!choice.TryGetProperty("message",out var message)||message.ValueKind!=JsonValueKind.Object)throw InvalidResponse();
+        if(message.TryGetProperty("tool_calls",out var calls)&&calls.ValueKind==JsonValueKind.Array&&calls.GetArrayLength()>0)
+        {
+            if(calls.GetArrayLength()!=1)throw new DeepSeekException(DeepSeekFailure.InvalidResponse,"一次只支持查询一个课表范围，请缩小问题后重试。");
+            var call=calls[0];
+            if(!call.TryGetProperty("id",out var id)||id.ValueKind!=JsonValueKind.String||!call.TryGetProperty("function",out var function)||function.ValueKind!=JsonValueKind.Object
+                ||!function.TryGetProperty("name",out var name)||name.ValueKind!=JsonValueKind.String||!function.TryGetProperty("arguments",out var arguments)||arguments.ValueKind!=JsonValueKind.String)throw InvalidResponse();
+            var result=new DeepSeekToolCall(id.GetString()!,name.GetString()!,arguments.GetString()!);
+            if(result.Name!="timetable_query"||result.Id.Length is <1 or >200||result.Arguments.Length>4096)throw InvalidResponse();
+            return new(null,result);
+        }
+        var text=message.TryGetProperty("content",out var content)&&content.ValueKind==JsonValueKind.String?content.GetString():null;
+        if(string.IsNullOrWhiteSpace(text))throw InvalidResponse();
+        return new(text,null);
+    }
+    public Task<string> Stream(string model,IReadOnlyList<ChatMessage> messages,Action<string> onDelta,CancellationToken ct,int maxTokens=4096)
+    {
+        Validate(model,messages);
+        return StreamCore(model,messages.Select(m=>(object)new {role=m.Role,content=m.Content}).ToArray(),onDelta,ct,maxTokens);
+    }
+    public Task<string> StreamToolResult(string model,IReadOnlyList<ChatMessage> messages,DeepSeekToolCall call,string result,Action<string> onDelta,CancellationToken ct)
+    {
+        Validate(model,messages);
+        if(call.Name!="timetable_query"||call.Id.Length is <1 or >200||call.Arguments.Length>4096||result.Length>16000)throw new ArgumentException("课表工具回复无效。");
+        var wire=messages.Select(m=>(object)new {role=m.Role,content=m.Content}).ToList();
+        wire.Add(new {role="assistant",content=(string?)null,tool_calls=new[]{new {id=call.Id,type="function",function=new {name=call.Name,arguments=call.Arguments}}}});
+        wire.Add(new {role="tool",tool_call_id=call.Id,content=result});
+        return StreamCore(model,wire,onDelta,ct,4096);
+    }
+    private static void Validate(string model,IReadOnlyList<ChatMessage> messages)
+    {
+        if(string.IsNullOrWhiteSpace(model))throw new InvalidOperationException("请先在哲里设置中获取并选择模型。");
+        if(messages.Count is <1 or >100||messages.Any(m=>m.Role is not ("system" or "user" or "assistant")||string.IsNullOrWhiteSpace(m.Content))||messages.Sum(m=>(long)m.Content.Length)>512000)
+            throw new ArgumentException("对话内容为空、过长或角色无效，请缩短内容或新建会话。");
+    }
+    private async Task<string> StreamCore(string model,IReadOnlyList<object> messages,Action<string> onDelta,CancellationToken ct,int maxTokens)
+    {
+        ArgumentNullException.ThrowIfNull(onDelta);
+        if(maxTokens is <1 or >8192)throw new ArgumentOutOfRangeException(nameof(maxTokens));
+        using var request=Request(HttpMethod.Post,"chat/completions");
+        request.Content=JsonContent.Create(new {model,thinking=new {type="disabled"},messages,stream=true,max_tokens=maxTokens});
+        using var deadline=CancellationTokenSource.CreateLinkedTokenSource(ct);
+        deadline.CancelAfter(_http.Timeout);
+        try
+        {
+            using var response=await _http.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,deadline.Token);
+            Check(response);
+            using var body=await response.Content.ReadAsStreamAsync(deadline.Token);
+            using var reader=new StreamReader(body,Encoding.UTF8);
+            var answer=new StringBuilder();var total=0;string? finish=null;var done=false;
+            while(await reader.ReadLineAsync(deadline.Token) is { } line)
+            {
+                total+=Encoding.UTF8.GetByteCount(line)+2;
+                if(total>MaxResponseBytes)throw InvalidResponse();
+                if(!line.StartsWith("data: ",StringComparison.Ordinal))continue;
+                if(line=="data: [DONE]"){done=true;break;}
+                using var chunk=JsonDocument.Parse(line.AsMemory(6));
+                if(!chunk.RootElement.TryGetProperty("choices",out var choices)||choices.ValueKind!=JsonValueKind.Array||choices.GetArrayLength()==0)throw InvalidResponse();
+                var first=choices[0];
+                if(first.TryGetProperty("finish_reason",out var reason)&&reason.ValueKind==JsonValueKind.String)finish=reason.GetString();
+                if(!first.TryGetProperty("delta",out var delta)||delta.ValueKind!=JsonValueKind.Object)continue;
+                if(delta.TryGetProperty("content",out var content)&&content.ValueKind==JsonValueKind.String)
+                {
+                    var text=content.GetString();
+                    if(!string.IsNullOrEmpty(text)){answer.Append(text);onDelta(text);}
+                }
+            }
+            if(finish=="content_filter")throw new DeepSeekException(DeepSeekFailure.Filtered,"服务未返回可显示的回答，请调整问题后重试。");
+            if(!done||answer.Length==0)throw InvalidResponse();
+            return finish=="length"?answer.ToString()+"\n\n（回答达到本次输出上限，内容可能不完整。）":answer.ToString();
+        }
+        catch(OperationCanceledException)when(!ct.IsCancellationRequested)
+        {throw new DeepSeekException(DeepSeekFailure.Timeout,"DeepSeek响应超时。可以稍后手动重试；不会自动重复发送。已发送的请求可能仍由服务处理并计费。");}
+        catch(HttpRequestException)
+        {throw new DeepSeekException(DeepSeekFailure.Network,"无法连接DeepSeek，请检查网络、代理或系统时间后重试。");}
+        catch(IOException)
+        {throw new DeepSeekException(DeepSeekFailure.Network,"读取DeepSeek响应时连接中断，请稍后手动重试。");}
+        catch(JsonException){throw InvalidResponse();}
     }
     private async Task<JsonDocument> Send(HttpRequestMessage request,CancellationToken ct)
     {
