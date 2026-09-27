@@ -97,7 +97,7 @@ public sealed class RecoverableFiles
         }
         var now=DateTimeOffset.UtcNow;
         var prepared=new FileAction(id,kind,source,target,backup,hash,now,now.AddDays(30),FileActionStatus.Prepared,
-            ResultSha256=replacement==null?null:Convert.ToHexString(SHA256.HashData(replacement)));
+            ResultSha256:replacement==null?null:Convert.ToHexString(SHA256.HashData(replacement)));
         try{Update(s=>s with{Actions=s.Actions.Prepend(prepared).ToList()},"准备文件操作");}
         catch{Directory.Delete(directory,true);throw;}
         try
