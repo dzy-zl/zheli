@@ -43,6 +43,7 @@ public sealed class PetWindow:Window
     private readonly CancellationTokenSource _lifetime=new();
     private readonly BridgeClient _core=new("core","Zheli.CoreHost");
     private readonly DraftStore<PetLocalState> _stateStore=new(System.IO.Path.Combine(AppPaths.DataRoot,"Miao","pet-window.json"));
+    private QuickPanelWindow? _quick;
     private PetLocalState _state=new();
     private bool _polling,_dragging,_restoring,_restoreQueued,_closed,_ready,_animated,_saveWarning,_readOnlyState;
     private int _idleCount;
@@ -87,17 +88,18 @@ public sealed class PetWindow:Window
         MouseLeftButtonUp+=(_,e)=>
         {
             var click=_gesture.Release(Pointer(e));ReleaseMouseCapture();e.Handled=true;
-            if(click)OpenChat();
+            if(click)OpenQuick();
         };
         LostMouseCapture+=(_,_)=>{if(!_dragging)_gesture.Cancel();};
         var menu=new ContextMenu();
-        AddMenu(menu,"打开对话",OpenChat);AddMenu(menu,"哲里设置",()=>Launch("Zheli.Settings"));
+        AddMenu(menu,"快捷对话",OpenQuick);AddMenu(menu,"打开完整窗口",OpenChat);AddMenu(menu,"哲里设置",()=>Launch("Zheli.Settings"));
         AddMenu(menu,"移回主屏右下角",ResetPosition);
         AddMenu(menu,"隐藏桌宠",()=>{_state=_state with{HiddenByUser=true};SaveState();ApplyVisibility();});
         AddMenu(menu,"退出桌宠",Close);ContextMenu=menu;
-        _tray=new Forms.NotifyIcon{Icon=System.Drawing.SystemIcons.Information,Text="哲喵 · 双击打开对话",Visible=true};
+        _tray=new Forms.NotifyIcon{Icon=System.Drawing.SystemIcons.Information,Text="哲喵 · 点击桌宠打开快捷对话",Visible=true};
         var trayMenu=new Forms.ContextMenuStrip();
-        trayMenu.Items.Add("打开对话",null,(_,_)=>Dispatcher.Invoke(OpenChat));
+        trayMenu.Items.Add("快捷对话",null,(_,_)=>Dispatcher.Invoke(OpenQuick));
+        trayMenu.Items.Add("打开完整窗口",null,(_,_)=>Dispatcher.Invoke(OpenChat));
         trayMenu.Items.Add("显示桌宠",null,(_,_)=>Dispatcher.Invoke(ShowFromTray));
         trayMenu.Items.Add("移回主屏右下角",null,(_,_)=>Dispatcher.Invoke(ResetPosition));
         trayMenu.Items.Add("哲里设置",null,(_,_)=>Dispatcher.Invoke(()=>Launch("Zheli.Settings")));
@@ -123,7 +125,7 @@ public sealed class PetWindow:Window
         {
             _closed=true;_lifetime.Cancel();_settingsTimer.Stop();_visibilityTimer.Stop();SetAnimations(false);
             SaveState();UnregisterHotKey(_handle,1);if(_source!=null)_source.RemoveHook(Hook);
-            _tray.Dispose();_lifetime.Dispose();Application.Current.Shutdown();
+            _quick?.Close();_tray.Dispose();_lifetime.Dispose();Application.Current.Shutdown();
         };
     }
 
@@ -154,6 +156,7 @@ public sealed class PetWindow:Window
         {
             var prefs=(await _core.Call<Snapshot<Preferences>>("settings.read",ct:_lifetime.Token)).Data;
             if(_closed)return;
+            _quick?.ApplyTheme(prefs.Theme=="Dark");
             var next=_state with{LastShowPet=prefs.ShowPet,LastReduceMotion=prefs.ReduceMotion,
                 HiddenByUser=prefs.ShowPet&&!_state.LastShowPet?false:_state.HiddenByUser};
             if(next!=_state){_state=next;SaveState();}
@@ -166,6 +169,7 @@ public sealed class PetWindow:Window
         if(_closed||!_ready||_dragging)return;
         var visible=!_state.HiddenByUser&&_state.LastShowPet&&!ForegroundFullscreen();
         if(!visible&&IsVisible)Hide();else if(visible&&!IsVisible)Show();
+        if(!visible&&_quick?.IsVisible==true)_quick.StopAndHide();
         if(!_restoring&&!_restoreQueued)Opacity=1;
         SetAnimations(visible&&!_state.LastReduceMotion&&SystemParameters.ClientAreaAnimation&&!SystemParameters.IsRemoteSession&&(RenderCapability.Tier>>16)>0);
     }
@@ -266,13 +270,35 @@ public sealed class PetWindow:Window
     }
     private IntPtr Hook(IntPtr hwnd,int msg,IntPtr w,IntPtr l,ref bool handled)
     {
-        if(msg==0x312&&w.ToInt32()==1){OpenChat();handled=true;}
+        if(msg==0x312&&w.ToInt32()==1){OpenQuick();handled=true;}
         else if(msg is 0x007E or 0x02E0 || (msg==0x001A&&w.ToInt64()==47))QueueRestore();
         return IntPtr.Zero;
     }
     private static void ShapeAt(Canvas c,Shape s,double x,double y){Canvas.SetLeft(s,x);Canvas.SetTop(s,y);c.Children.Add(s);}
     private static void AddMenu(ContextMenu c,string label,Action action){var m=new MenuItem{Header=label};m.Click+=(_,_)=>action();c.Items.Add(m);}
     private void Notify(string text)=>_tray.ShowBalloonTip(4000,"哲喵",text,Forms.ToolTipIcon.Info);
-    private void OpenChat()=>Launch("Zheli.Miao");
+    private void OpenQuick()
+    {
+        try
+        {
+            if(_quick?.IsVisible==true){_quick.StopAndHide();return;}
+            _quick??=new QuickPanelWindow(OpenChat);
+            _quick.Show();
+            if(GetWindowRect(_handle,out var pet)&&GetWindowRect(new WindowInteropHelper(_quick).Handle,out var panel))
+            {
+                var work=Forms.Screen.FromHandle(_handle).WorkingArea;
+                var width=panel.Right-panel.Left;var height=panel.Bottom-panel.Top;
+                var x=pet.Left-width-10;
+                if(x<work.Left)x=pet.Right+10;
+                x=Math.Clamp(x,work.Left,Math.Max(work.Left,work.Right-width));
+                var y=Math.Clamp(pet.Bottom-height,work.Top,Math.Max(work.Top,work.Bottom-height));
+                SetWindowPos(new WindowInteropHelper(_quick).Handle,IntPtr.Zero,x,y,0,0,0x0001|0x0004);
+            }
+            _quick.Activate();
+        }
+        catch(Exception e)when(e is IOException or StoreException or InvalidOperationException or UnauthorizedAccessException)
+        {Notify("快捷面板暂时无法打开："+e.Message);}
+    }
+    private void OpenChat(){_quick?.StopAndHide();Launch("Zheli.Miao");}
     private void Launch(string app){try{AppPaths.Launch(app);}catch(Exception e){_tray.ShowBalloonTip(4000,"哲喵",e.Message,Forms.ToolTipIcon.Warning);}}
 }

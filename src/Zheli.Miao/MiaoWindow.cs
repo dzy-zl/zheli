@@ -69,7 +69,16 @@ public sealed class MiaoWindow:ShellWindow
     }
     public void AcceptContext(string? encoded)
     {
-        if(encoded==null)return;
+        if(encoded==null)
+        {
+            if(_sending==null&&!_preparingMessage)
+            {
+                _snapshot=_store.Read();
+                var latest=_snapshot.Data.Conversations.FirstOrDefault(c=>c.DeletedAt==null);
+                if(latest!=null){_conversation=latest.Id;RefreshMessages();}
+            }
+            return;
+        }
         if(_sending!=null||_preparingMessage){Status.Text="收到新的课表入口；请先结束当前发送，再从课表重新打开以切换上下文。";return;}
         try
         {
