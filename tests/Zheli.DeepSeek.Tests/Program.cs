@@ -14,7 +14,7 @@ if(args.Contains("--live"))
     {
         using var client=new DeepSeekClient(credentials);
         var models=await client.Models();Console.WriteLine("PASS live model discovery; count="+models.Count);
-        var model=models.FirstOrDefault(m=>m=="deepseek-chat")??models.First();
+        var model=models.FirstOrDefault(m=>m=="deepseek-flash")??models.First();
         Console.WriteLine("Selected model: "+model);
         var answer=await client.Complete(model,[new("system","你是哲喵。只依据合成测试资料回答，不执行任何操作。"),new("user","合成测试：明天第一节课是高等数学，教室A301。请只回答课程名称和教室。")],CancellationToken.None,128);
         if(!answer.Contains("高等数学")||!answer.Contains("A301"))throw new InvalidDataException();
@@ -55,6 +55,7 @@ await Test("request endpoint, authorization and bounded output",async()=>
         using var json=JsonDocument.Parse(await r.Content!.ReadAsStringAsync(ct));
         Check(json.RootElement.GetProperty("max_tokens").GetInt32()==2048);
         Check(!json.RootElement.GetProperty("stream").GetBoolean());
+        Check(json.RootElement.GetProperty("thinking").GetProperty("type").GetString()=="disabled");
         return Response(valid);
     }));Check(await Chat(client)=="你好");
 });
@@ -93,6 +94,52 @@ await Test("failure makes one request without retry",async()=>
 {
     int calls=0;using var c=new DeepSeekClient(()=>"synthetic",new FakeHandler((_,_)=>{calls++;return Task.FromResult(Response("remote-secret",503));}));
     await Expect(DeepSeekFailure.Service,async()=>await Chat(c));Check(calls==1);
+});
+await Test("streaming collects content deltas and disables thinking",async()=>
+{
+    var deltas=new List<string>();
+    using var c=new DeepSeekClient(()=>"synthetic",new FakeHandler(async(r,ct)=>
+    {
+        using var body=JsonDocument.Parse(await r.Content!.ReadAsStringAsync(ct));
+        Check(body.RootElement.GetProperty("stream").GetBoolean());
+        Check(body.RootElement.GetProperty("thinking").GetProperty("type").GetString()=="disabled");
+        var sse="data: {\"choices\":[{\"delta\":{\"content\":\"你好\"},\"finish_reason\":null}]}\n\n"
+            +"data: {\"choices\":[{\"delta\":{\"content\":\"，世界\"},\"finish_reason\":null}]}\n\n"
+            +"data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}\n\n"+"data: [DONE]\n\n";
+        return new HttpResponseMessage(HttpStatusCode.OK){Content=new StringContent(sse,Encoding.UTF8,"text/event-stream")};
+    }));
+    var answer=await c.Stream("deepseek-flash",[new("user","你好")],deltas.Add,CancellationToken.None);
+    Check(answer=="你好，世界"&&deltas.SequenceEqual(new[]{"你好","，世界"}));
+});
+await Test("timetable tool selection and result round trip",async()=>
+{
+    var calls=0;
+    using var c=new DeepSeekClient(()=>"synthetic",new FakeHandler(async(r,ct)=>
+    {
+        using var body=JsonDocument.Parse(await r.Content!.ReadAsStringAsync(ct));
+        Check(body.RootElement.GetProperty("thinking").GetProperty("type").GetString()=="disabled");
+        calls++;
+        if(calls==1)
+        {
+            Check(body.RootElement.GetProperty("tool_choice").GetString()=="auto");
+            return Response("{\"choices\":[{\"finish_reason\":\"tool_calls\",\"message\":{\"content\":null,\"tool_calls\":[{\"id\":\"call1\",\"type\":\"function\",\"function\":{\"name\":\"timetable_query\",\"arguments\":\"{\\\"from\\\":\\\"2026-09-28\\\",\\\"through\\\":\\\"2026-09-28\\\"}\"}}]}}]}");
+        }
+        var messages=body.RootElement.GetProperty("messages");
+        Check(messages[messages.GetArrayLength()-2].GetProperty("tool_calls")[0].GetProperty("id").GetString()=="call1");
+        Check(messages[messages.GetArrayLength()-1].GetProperty("tool_call_id").GetString()=="call1");
+        Check(messages[messages.GetArrayLength()-1].GetProperty("content").GetString()=="已授权的合成课程");
+        return new HttpResponseMessage(HttpStatusCode.OK){Content=new StringContent("data: {\"choices\":[{\"delta\":{\"content\":\"大学英语 08:00\"},\"finish_reason\":null}]}\n\ndata: {\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n",Encoding.UTF8,"text/event-stream")};
+    }));
+    ChatMessage[] history=[new("user","明天第一节什么课")];
+    var decision=await c.SelectTimetableTool("deepseek-flash",history,CancellationToken.None);
+    Check(decision.Call is {Name:"timetable_query"});
+    var answer=await c.StreamToolResult("deepseek-flash",history,decision.Call!,"已授权的合成课程",_=>{},CancellationToken.None);
+    Check(answer=="大学英语 08:00"&&calls==2);
+});
+await Test("unknown tool is never accepted",async()=>
+{
+    using var c=Client("{\"choices\":[{\"message\":{\"tool_calls\":[{\"id\":\"call1\",\"function\":{\"name\":\"delete_file\",\"arguments\":\"{}\"}}]}}]}");
+    await Expect(DeepSeekFailure.InvalidResponse,async()=>await c.SelectTimetableTool("deepseek-flash",[new("user","测试")],CancellationToken.None));
 });
 Console.WriteLine($"RESULT: {passed} passed, {failed} failed; offline HTTP transport tests");
 Environment.ExitCode=failed==0?0:1;

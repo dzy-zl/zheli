@@ -108,7 +108,12 @@ public class ShellWindow : Window
     {
         Root.RequestedTheme=Appearance.Theme switch {"Light"=>ElementTheme.Light,"Dark"=>ElementTheme.Dark,_=>ElementTheme.Default};
         var dark=Root.ActualTheme==ElementTheme.Dark;
-        Root.Background=_accessibility.HighContrast?new SolidColorBrush(_uiSettings.GetColorValue(Windows.UI.ViewManagement.UIColorType.Background)):Ui.Brush(dark?"171D25":"F5F4F0");
+        var opaque=_accessibility.HighContrast||Appearance.ReduceTransparency;
+        // The window backdrop shows the desktop only when the XAML root stays transparent.
+        SystemBackdrop=opaque?null:SystemBackdrop is DesktopAcrylicBackdrop?SystemBackdrop:new DesktopAcrylicBackdrop();
+        Root.Background=opaque
+            ?_accessibility.HighContrast?new SolidColorBrush(_uiSettings.GetColorValue(Windows.UI.ViewManagement.UIColorType.Background)):Ui.Brush(dark?"171D25":"F5F4F0")
+            :new SolidColorBrush(Microsoft.UI.Colors.Transparent);
         Ui.ApplyTextScale(Root,Appearance.TextScale);
         foreach(var weak in _glass.ToArray())
         {if(weak.TryGetTarget(out var panel))panel.Apply(Appearance,dark,_accessibility.HighContrast);else _glass.Remove(weak);}
