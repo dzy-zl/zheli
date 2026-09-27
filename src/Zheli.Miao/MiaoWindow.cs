@@ -348,7 +348,7 @@ public sealed class MiaoWindow:ShellWindow
                 if(!await Form("编辑文本并保存 30 天恢复副本",editor,"保存更改")||editor.Text==previous.Text)return;
                 await _files.EditText(source,previous.Sha256,editor.Text);
                 Status.Text="文本已保存；30 天内可从操作记录撤销。";await ShowFileActions();
-            }))));
+            })))));
         list.Children.Add(Ui.Text("最近操作",19,true));
         foreach(var action in _files.History().Take(50))
         {
