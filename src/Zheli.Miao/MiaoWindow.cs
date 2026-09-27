@@ -79,7 +79,7 @@ public sealed class MiaoWindow:ShellWindow
             {
                 _snapshot=_store.Read();
                 var latest=_snapshot.Data.Conversations.FirstOrDefault(c=>c.DeletedAt==null);
-                if(latest!=null){_conversation=latest.Id;RefreshMessages();}
+                if(latest!=null){_conversation=latest.Id;Workspace.Content=_chatGrid;RefreshMessages();}
             }
             return;
         }
@@ -89,6 +89,7 @@ public sealed class MiaoWindow:ShellWindow
             if(encoded.Length>4096)return;
             _context=JsonSerializer.Deserialize<ChatContext>(Convert.FromBase64String(encoded),Protocol.Json);
             _lastCourses=[];_sendCourse.IsChecked=false;
+            Workspace.Content=_chatGrid;
             _contextLabel.Text=$"哲里课表 · 第{_context?.Week}周"+(_context?.Selected!=null?" · 已选课程":"");
         }
         catch {_contextLabel.Text="上下文无效，未读取任何课程数据";}
@@ -96,14 +97,21 @@ public sealed class MiaoWindow:ShellWindow
     private void EnsureIdle(){if(_sending!=null||_indexing||_preparingMessage)throw new InvalidOperationException("请先结束当前发送或停止索引更新，再操作。");}
     private void Persist(Func<MiaoState,MiaoState> change,string summary)
     {
-        _snapshot=_store.Read();var next=change(_snapshot.Data);
-        var receipt=_store.Write(Guid.NewGuid().ToString(),_snapshot.Revision,summary,_=>next,DocumentStore<MiaoState>.Hash(JsonSerializer.Serialize(next)));
-        _snapshot=new(receipt.Revision,next);
+        for(var attempt=0;attempt<3;attempt++)
+        {
+            _snapshot=_store.Read();var next=change(_snapshot.Data);
+            try
+            {
+                var receipt=_store.Write(Guid.NewGuid().ToString(),_snapshot.Revision,summary,_=>next,DocumentStore<MiaoState>.Hash(JsonSerializer.Serialize(next)));
+                _snapshot=new(receipt.Revision,next);return;
+            }
+            catch(StoreException e)when(e.Code=="STALE_VERSION"&&attempt<2){}
+        }
     }
     private void NewConversation()
     {
         var c=new Conversation(Guid.NewGuid().ToString("N"),"新会话",[]);
-        Persist(s=>s with{Conversations=s.Conversations.Prepend(c).ToList()},"新建会话");_conversation=c.Id;_lastCourses=[];_sendCourse.IsChecked=false;_lastFileHits=[];_sendFiles.IsChecked=false;RefreshMessages();
+        Persist(s=>s with{Conversations=s.Conversations.Prepend(c).ToList()},"新建会话");_conversation=c.Id;_lastCourses=[];_sendCourse.IsChecked=false;_lastFileHits=[];_sendFiles.IsChecked=false;Workspace.Content=_chatGrid;RefreshMessages();
     }
     private Conversation ActiveConversation=>_snapshot.Data.Conversations.Single(x=>x.Id==_conversation);
     private void Add(string role,string text,bool local=false)
@@ -116,7 +124,7 @@ public sealed class MiaoWindow:ShellWindow
         _messages.Children.Clear();_conversationList.Children.Clear();
         foreach(var c in _snapshot.Data.Conversations.Where(x=>x.DeletedAt==null))
         {
-            _conversationList.Children.Add(Ui.Button(c.Title,()=>Guard(()=>{EnsureIdle();_conversation=c.Id;_lastCourses=[];_sendCourse.IsChecked=false;_lastFileHits=[];_sendFiles.IsChecked=false;RefreshMessages();return Task.CompletedTask;})));
+            _conversationList.Children.Add(Ui.Button(c.Title,()=>Guard(()=>{EnsureIdle();_conversation=c.Id;_lastCourses=[];_sendCourse.IsChecked=false;_lastFileHits=[];_sendFiles.IsChecked=false;Workspace.Content=_chatGrid;RefreshMessages();return Task.CompletedTask;})));
         }
         _messages.Children.Add(Ui.Row(Ui.Button("重命名",()=>Guard(Rename)),Ui.Button("删除会话",()=>Guard(DeleteConversation))));
         if(ActiveConversation.Messages.Count==0)_messages.Children.Add(Ui.Card(Ui.Stack(Ui.Text("你好，我是哲喵。",24,true),Ui.Text("可以先使用本地课表查询；配置DeepSeek后再进行AI对话。查询得到的课程和文件摘录默认不进入云端聊天历史。"))));
@@ -334,13 +342,16 @@ public sealed class MiaoWindow:ShellWindow
         list.Children.Add(Ui.Text("最近操作",19,true));
         foreach(var action in _files.History().Take(50))
         {
-            var line=Ui.Stack(Ui.Text($"{action.Kind} · {Path.GetFileName(action.Source)}",14,true),
-                Ui.Text($"{action.Created.ToLocalTime():g} · {action.Status} · 恢复期限 {action.Expires.ToLocalTime():g}",12),
+            var kind=action.Kind switch{FileActionKind.Rename=>"改名",FileActionKind.Move=>"移动",_=>"可恢复删除"};
+            var state=action.Status switch{FileActionStatus.Prepared=>"准备中",FileActionStatus.Complete=>"可撤销",FileActionStatus.Undone=>"已恢复",FileActionStatus.Expired=>"已到期",_=>"需检查"};
+            var line=Ui.Stack(Ui.Text($"{kind} · {Path.GetFileName(action.Source)}",14,true),
+                Ui.Text($"{action.Created.ToLocalTime():g} · {state} · 恢复期限 {action.Expires.ToLocalTime():g}",12),
                 Ui.Text(action.Target??"可恢复删除",12));
             if(action.Status==FileActionStatus.Complete && action.Expires>DateTimeOffset.UtcNow)
                 line.Children.Add(Ui.Button("撤销此操作",()=>Guard(async()=>
                 {
                     var undone=await _files.Undo(action.Id);
+                    _selectedFile=undone.RestoredTo;
                     Status.Text="已恢复："+undone.RestoredTo;await ShowFileActions();
                 })));
             if((action.Status is FileActionStatus.NeedsReview or FileActionStatus.Prepared) && action.Expires>DateTimeOffset.UtcNow)
@@ -349,6 +360,7 @@ public sealed class MiaoWindow:ShellWindow
                 line.Children.Add(Ui.Button("恢复副本",()=>Guard(async()=>
                 {
                     var restored=await _files.RestoreCopy(action.Id);
+                    _selectedFile=restored.RestoredTo;
                     Status.Text="恢复副本已存到："+restored.RestoredTo;await ShowFileActions();
                 })));
             }
