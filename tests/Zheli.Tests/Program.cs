@@ -78,6 +78,7 @@ Test("local search only authorized txt/md",()=>{var folder=Path.Combine(testRoot
 if(!OperatingSystem.IsWindows())Test("local search skips symlink escape",()=>{var folder=Path.Combine(testRoot,"linked");Directory.CreateDirectory(folder);var outside=Path.Combine(testRoot,"outside.txt");File.WriteAllText(outside,"秘密内容");File.CreateSymbolicLink(Path.Combine(folder,"link.txt"),outside);Eq(0,new LocalTextSearch().Search(folder,"秘密",CancellationToken.None).GetAwaiter().GetResult().Count);});
 KnowledgeTests.Run(Test,testRoot);
 PetDesktopTests.Run(Test,testRoot);
+MiaoIntentTests.Run(Test);
 Console.WriteLine($"RESULT: {passed} passed, {failed} failed");
 Console.WriteLine("Windows UI, named-pipe identity, credential vault and live DeepSeek are not covered by this cross-platform runner.");
 Environment.ExitCode=failed==0?0:1;
