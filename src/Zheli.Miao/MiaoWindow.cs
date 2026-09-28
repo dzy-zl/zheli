@@ -39,7 +39,7 @@ public sealed class MiaoWindow:ShellWindow
     public MiaoWindow():base("Miao","哲喵")
     {
         _scroll=Ui.Scroll(_messages);
-        _input.Text="";_input.PlaceholderText="打字交流，或使用本地快捷操作…";_input.AcceptsReturn=true;_input.MaxHeight=160;_input.MinHeight=72;
+        _input.Text="";_input.PlaceholderText="例如：明天第一节课是什么？搜索文件：高等数学";_input.AcceptsReturn=true;_input.MaxHeight=160;_input.MinHeight=72;
         Toolbar.Children.Add(Ui.Text("哲喵",24,true));Toolbar.Children.Add(_mode);
         Toolbar.Children.Add(Ui.Button("显示桌宠",()=>Guard(()=>{AppPaths.Launch("Zheli.PetHost");return Task.CompletedTask;})));
         Nav("新建会话",()=>Guard(()=>{EnsureIdle();NewConversation();return Task.CompletedTask;}));
@@ -48,7 +48,7 @@ public sealed class MiaoWindow:ShellWindow
         Navigation.Children.Add(_conversationList);
         var grid=new Grid{RowSpacing=10};grid.RowDefinitions.Add(new(){Height=GridLength.Auto});grid.RowDefinitions.Add(new(){Height=new GridLength(1,GridUnitType.Star)});grid.RowDefinitions.Add(new(){Height=GridLength.Auto});
         var context=Ui.Stack(Ui.Row(_contextLabel,Ui.Button("清除上下文",()=>Guard(()=>{EnsureIdle();_context=null;_lastCourses=[];_sendCourse.IsChecked=false;_lastFileHits=[];_sendFiles.IsChecked=false;_contextLabel.Text="无应用上下文";return Task.CompletedTask;}))),
-            Ui.Row(Ui.Button("明天课程",()=>Guard(QueryTomorrow)),Ui.Button("本周课程",()=>Guard(QueryWeek)),Ui.Button("本地文件搜索",()=>Guard(SearchFiles))),
+            Ui.Row(Ui.Button("明天课程",()=>Guard(QueryTomorrow)),Ui.Button("本周课程",()=>Guard(QueryWeek)),Ui.Button("本地文件搜索",()=>Guard(()=>SearchFiles()))),
             Ui.Row(Ui.Button("调整所选课程",()=>Guard(ChangeSelected)),
                 Ui.Button("所选课程停一次",()=>Guard(CancelSelected)),
                 Ui.Button("撤销哲喵修改",()=>Guard(UndoChange))));
@@ -105,7 +105,7 @@ public sealed class MiaoWindow:ShellWindow
             _conversationList.Children.Add(Ui.Button(c.Title,()=>Guard(()=>{EnsureIdle();_conversation=c.Id;_lastCourses=[];_sendCourse.IsChecked=false;_lastFileHits=[];_sendFiles.IsChecked=false;RefreshMessages();return Task.CompletedTask;})));
         }
         _messages.Children.Add(Ui.Row(Ui.Button("重命名",()=>Guard(Rename)),Ui.Button("删除会话",()=>Guard(DeleteConversation))));
-        if(ActiveConversation.Messages.Count==0)_messages.Children.Add(Ui.Card(Ui.Stack(Ui.Text("你好，我是哲喵。",24,true),Ui.Text("可以先使用本地课表查询；配置DeepSeek后再进行AI对话。查询得到的课程和文件摘录默认不进入云端聊天历史。"))));
+        if(ActiveConversation.Messages.Count==0)_messages.Children.Add(Ui.Card(Ui.Stack(Ui.Text("你好，我是哲喵。",24,true),Ui.Text("试试输入“明天第一节课是什么？”“下周三有什么课？”或“搜索文件：高等数学”。这些明确的本地请求不会发到云端；其他问题可以切换 DeepSeek 对话。"))));
         foreach(var m in ActiveConversation.Messages)
         {
             var card=Ui.Card(Ui.Stack(Ui.Text(m.Role=="user"?"你":"哲喵",12,true),Ui.Text(m.Text),Ui.Text(m.LocalOnly?"仅限本地 · 不随历史发送给AI":m.Time.ToLocalTime().ToString("HH:mm"),12)));
@@ -133,22 +133,37 @@ public sealed class MiaoWindow:ShellWindow
     }
     private Task QueryTomorrow(){var tomorrow=DateOnly.FromDateTime(DateTime.Now).AddDays(1);return Query(new(tomorrow,tomorrow));}
     private Task QueryWeek(){var today=DateOnly.FromDateTime(DateTime.Now);var monday=today.AddDays(-((int)today.DayOfWeek+6)%7);return Query(new(monday,monday.AddDays(6)));}
-    private async Task Query(QueryRange range)
+    private async Task Query(QueryRange range,bool firstOnly=false)
     {
         EnsureIdle();Status.Text="正在通过课表接口查询…";
-        _lastCourses=await _timetable.Call<List<CourseSummary>>("timetable.query",range);
-        var text=_lastCourses.Count==0?"这段时间没有课程。":string.Join("\n\n",_lastCourses.Select(c=>$"{c.Date:M月d日} · {c.Name}\n第{c.StartPeriod}—{c.EndPeriod}节  {c.Start:HH:mm}—{c.End:HH:mm}\n{c.Room} · {c.Teacher} · {c.Status}"));
+        var courses=await _timetable.Call<List<CourseSummary>>("timetable.query",range);
+        _lastCourses=firstOnly?courses.Where(c=>c.Status!="本次停课").OrderBy(c=>c.Date).ThenBy(c=>c.Start).Take(1).ToList():courses;
+        var text=_lastCourses.Count==0?(firstOnly?"这段时间没有待上的课程。":"这段时间没有课程。"):
+            string.Join("\n\n",_lastCourses.Select(c=>$"{c.Date:M月d日} · {c.Name}\n第{c.StartPeriod}—{c.EndPeriod}节  {c.Start:HH:mm}—{c.End:HH:mm}\n{c.Room} · {c.Teacher} · {c.Status}"));
         Add("assistant",text+"\n\n来源：哲里课表 · 本地查询",true);Status.Text="查询完成；没有发送给DeepSeek。";
     }
     private async Task Send()
     {
         EnsureIdle();var question=_input.Text.Trim();if(question.Length==0)return;
         if(question.Length>16000)throw new InvalidOperationException("单条消息过长，请分段输入。");
+        var intent=MiaoIntentParser.Parse(question,DateOnly.FromDateTime(DateTime.Now));
+        if(intent!=null)
+        {
+            Add("user",question,true);_input.Text="";
+            switch(intent.Action)
+            {
+                case MiaoAction.QueryTimetable: await Query(new(intent.From!.Value,intent.Through!.Value),intent.FirstOnly);break;
+                case MiaoAction.SearchFiles: await SearchFiles(intent.SearchTerm);break;
+                case MiaoAction.CancelSelected: await CancelSelected();break;
+                case MiaoAction.ChangeSelected: await ChangeSelected();break;
+                case MiaoAction.UndoChange: await UndoChange();break;
+            }
+            return;
+        }
         if(_mode.SelectedIndex==0)
         {
-            if(question is "明天课程" or "明天第一节课是什么" or "明天第一节课是什么？"){Add("user",question,true);_input.Text="";await QueryTomorrow();return;}
-            if(question=="本周课程"){Add("user",question,true);_input.Text="";await QueryWeek();return;}
-            Add("user",question,true);_input.Text="";Add("assistant","当前为仅本地模式。可以使用“明天课程”“本周课程”按钮。修改所选课程请使用专用操作按钮并确认。复杂自然语言请切换DeepSeek对话。",true);return;
+            Add("user",question,true);_input.Text="";
+            Add("assistant","我还不能可靠理解这条本地指令。可试试“今天有什么课？”“下周三第一节课是什么？”或“搜索文件：关键词”；复杂问题可切换 DeepSeek 对话。",true);return;
         }
         _preparingMessage=true;
         try{await SendCloud(question);}finally{_preparingMessage=false;}
@@ -206,21 +221,26 @@ public sealed class MiaoWindow:ShellWindow
         catch(Exception e){Add("assistant",e.Message,true);Status.Text="请求未完成，可检查设置后手动重试。";}
         finally{_sending.Dispose();_sending=null;_input.IsEnabled=true;_mode.IsEnabled=true;_sendCourse.IsChecked=false;_sendFiles.IsChecked=false;}
     }
-    private async Task SearchFiles()
+    private async Task SearchFiles(string? keyword=null)
     {
         EnsureIdle();
         var prefs=(await Core.Call<Snapshot<Preferences>>("settings.read")).Data;
         if(!prefs.KnowledgeFolders.Any(f=>f.Enabled))throw new InvalidOperationException("请先在哲里设置 → 文件知识库中授权文件夹。");
-        var query=Ui.Input("本地关键词（最多80字）");
-        if(!await Form("检索文件知识库",Ui.Stack(Ui.Text("检索已授权文件夹中的文字；支持PDF、DOCX、XLSX、PPTX、TXT与Markdown。原文件只读，检索过程不联网。"),query),"搜索"))return;
-        if(string.IsNullOrWhiteSpace(query.Text))return;
+        var query=keyword;
+        if(query==null)
+        {
+            var entry=Ui.Input("本地关键词（最多80字）");
+            if(!await Form("检索文件知识库",Ui.Stack(Ui.Text("检索已授权文件夹中的文字；支持PDF、DOCX、XLSX、PPTX、TXT与Markdown。原文件只读，检索过程不联网。"),entry),"搜索"))return;
+            query=entry.Text;
+        }
+        if(string.IsNullOrWhiteSpace(query))return;
         EnsureIdle();
         _indexing=true;_lastFileHits=[];_sendFiles.IsChecked=false;_indexWork=CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token);
         try
         {
             Status.Text="核对文件并本地检索中，可点击停止…";
             prefs=(await Core.Call<Snapshot<Preferences>>("settings.read")).Data;
-            var result=await _knowledge.Search(prefs.KnowledgeFolders,query.Text,_indexWork.Token);
+            var result=await _knowledge.Search(prefs.KnowledgeFolders,query,_indexWork.Token);
             var latest=(await Core.Call<Snapshot<Preferences>>("settings.read")).Data;
             _lastFileHits=result.Hits.Where(h=>KnowledgePolicy.CanRead(latest.KnowledgeFolders,h.RootId,h.FullPath)&&latest.KnowledgeFolders.Any(f=>f.Id==h.RootId&&Path.GetFullPath(f.Path).Equals(h.RootPath,StringComparison.OrdinalIgnoreCase))).ToList();
             var text=_lastFileHits.Count==0?"未找到匹配片段；不代表未识别的扫描页或跳过文件中没有内容。":string.Join("\n\n",_lastFileHits.Select((r,i)=>$"[文件{i+1}] {r.RelativePath} · {r.Location}\n{r.Text}"));
