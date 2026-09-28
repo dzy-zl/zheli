@@ -72,6 +72,16 @@ jobs:
           path: artifacts/installers-*/
           if-no-files-found: error
           retention-days: 14
+      - name: Upload tested Miao installer separately
+        uses: actions/upload-artifact@v4
+        with:
+          name: Zheli-Miao-Windows-x64-Test-Installer
+          path: |
+            artifacts/installers-*/Zheli-Miao-*-Setup.exe
+            artifacts/installers-*/SHA256.json
+            artifacts/installers-*/build-info.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload build and installer diagnostics
         if: always()
         uses: actions/upload-artifact@v4
