@@ -31,7 +31,7 @@ public static class MiaoIntentParser
             return term.Length is >= 1 and <= 80 ? new(MiaoAction.SearchFiles, SearchTerm: term) : null;
         }
 
-        if (!Regex.IsMatch(text, @"课表|课程|上什么课|有课|第[一1]节课|首节课") ||
+        if (!Regex.IsMatch(text, @"课表|课程|上什么课|有什么课|有课|第[一1]节课|首节课") ||
             Regex.IsMatch(text, @"文件|资料|天气|同时|顺便|以及|并且|然后|或者|取消|删除|调整|修改|调课|停课|移动|改到|挪到|和|如何|怎么|为什么|解释|准备|分析|建议|推荐|提醒|通知")) return null;
 
         DateOnly? from = null, through = null;
