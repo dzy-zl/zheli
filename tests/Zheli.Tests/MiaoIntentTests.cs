@@ -11,6 +11,7 @@ internal static class MiaoIntentTests
             if(actual!=expected)throw new InvalidDataException($"expected {expected}, got {actual}");
         });
         Expect("明天第一节课是什么？",new(MiaoAction.QueryTimetable,new DateOnly(2026,9,29),new DateOnly(2026,9,29),true));
+        Expect("明天有什么课？",new(MiaoAction.QueryTimetable,new DateOnly(2026,9,29),new DateOnly(2026,9,29)));
         Expect("下周三有什么课？",new(MiaoAction.QueryTimetable,new DateOnly(2026,10,7),new DateOnly(2026,10,7)));
         Expect("周日有课吗？",new(MiaoAction.QueryTimetable,new DateOnly(2026,10,4),new DateOnly(2026,10,4)));
         Expect("本周课程",new(MiaoAction.QueryTimetable,new DateOnly(2026,9,28),new DateOnly(2026,10,4)));
