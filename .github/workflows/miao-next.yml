@@ -1,0 +1,42 @@
+name: Miao Next Windows
+
+on:
+  pull_request:
+    paths:
+      - 'miao-next/**'
+      - '.github/workflows/miao-next.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch pinned upstream and apply Zheli theme
+        shell: pwsh
+        run: ./miao-next/build.ps1
+      - name: Install upstream runtime and packaging dependencies
+        shell: pwsh
+        run: python -m pip install -r miao-next/_upstream/requirements.txt 'pyinstaller>=6.21,<7' pywin32 edge-tts
+      - name: Check Python syntax and theme JSON
+        shell: pwsh
+        run: |
+          python -m compileall -q miao-next/_upstream/desktop_pet.py miao-next/_upstream/model_registry.py
+          python -m json.tool miao-next/plugins/theme_zheli_ceramic/plugin.json > $null
+      - name: Build portable package using upstream pipeline
+        shell: pwsh
+        run: |
+          $env:DP_PYTHON = (Get-Command python).Source
+          & ./miao-next/_upstream/tools/build_portable.ps1 -Version '2.9.1-zheli-preview.1'
+          if ($LASTEXITCODE -ne 0) { throw 'Package failed' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Zheli-Miao-Preview
+          path: miao-next/_upstream/release_build/DeepSeekPet_v2.9.1-zheli-preview.1_portable.zip
+          if-no-files-found: error
+          retention-days: 7
