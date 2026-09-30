@@ -29,17 +29,20 @@ jobs:
       - name: Check Python syntax and theme JSON
         shell: pwsh
         run: |
-          python -m compileall -q miao-next/_upstream/desktop_pet.py miao-next/_upstream/model_registry.py
+          python -m compileall -q miao-next/_upstream/desktop_pet.py miao-next/_upstream/model_registry.py miao-next/_upstream/zheli_shell.py
           python -m json.tool miao-next/plugins/theme_zheli_ceramic/plugin.json > $null
+      - name: Verify independent chat windows
+        shell: pwsh
+        run: python miao-next/tests/test_shell.py
       - name: Build portable package using upstream pipeline
         shell: pwsh
         run: |
           $env:DP_PYTHON = (Get-Command python).Source
-          & ./miao-next/_upstream/tools/build_portable.ps1 -Version '2.9.1-zheli-preview.1'
+          & ./miao-next/_upstream/tools/build_portable.ps1 -Version '2.9.1-zheli-preview.2'
           if ($LASTEXITCODE -ne 0) { throw 'Package failed' }
       - uses: actions/upload-artifact@v4
         with:
           name: Zheli-Miao-Preview
-          path: miao-next/_upstream/release_build/DeepSeekPet_v2.9.1-zheli-preview.1_portable.zip
+          path: miao-next/_upstream/release_build/DeepSeekPet_v2.9.1-zheli-preview.2_portable.zip
           if-no-files-found: error
           retention-days: 7

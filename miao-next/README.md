@@ -9,7 +9,7 @@
 - 字体：系统安装的苹方（`PingFang SC`）；系统无此字体时由 Qt 回退。
 - 基准环境：Windows 11，2560 × 1600，150% 缩放。
 
-这个预览版沿用上游的单窗口结构：猫位于聊天面板上方，面板能拖动调整大小。概念图中的“独立常驻猫 → 趴在卡片上的快捷对话 → 完整三栏窗口”尚需进一步的窗口布局改造；本版不声称已经实现三种窗口形态。趴卧参考图暂不打包，因为生成的透明版本仍带有背景色晕。
+Preview 2 将上游聊天组件移入独立窗口：单击桌宠打开快捷对话，点击“展开完整窗口”显示左侧导航、中间对话、右侧上游信息栏；“收起”返回桌宠。两种对话模式共用原有输入、历史、附件及发送处理，切换不复制对话，也不丢弃草稿。完整窗口支持系统边框缩放。趴卧猫美术仍未完成，当前继续使用已交付的待机立绘。
 
 ## 复用与改动
 
@@ -24,7 +24,8 @@ Windows PowerShell 7、Git、Python 3.12 环境：
 ```powershell
 pwsh -File .\miao-next\build.ps1
 python -m pip install -r .\miao-next\_upstream\requirements.txt 'pyinstaller>=6.21,<7' pywin32 edge-tts
-pwsh -File .\miao-next\_upstream\tools\build_portable.ps1 -Version 2.9.1-zheli-preview.1
+python .\miao-next\tests\test_shell.py
+pwsh -File .\miao-next\_upstream\tools\build_portable.ps1 -Version 2.9.1-zheli-preview.2
 ```
 
 `build.ps1` 首次执行会在 `miao-next/_upstream` 拉取上游源码。更方便的方式是在此分支的 GitHub Actions 运行 `Miao Next Windows`，它会自动安装依赖并生成 `Zheli-Miao-Preview` 便携包产物。构建脚本在找不到预期的上游语句时直接失败，不会在未知的新版本上静默套用替换。
