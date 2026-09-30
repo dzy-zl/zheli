@@ -47,6 +47,14 @@ $ui = Join-Path $SourceDir 'desktop_pet.py'
 Copy-Item (Join-Path $PSScriptRoot 'overlay/zheli_shell.py') (Join-Path $SourceDir 'zheli_shell.py')
 Replace-Once $ui '    pet = PetWidget()' "    pet = PetWidget()`n    from zheli_shell import install`n    install(pet)"
 Replace-Once $ui '    def toggle_chat_panel(self):' "    def toggle_chat_panel(self):`n        if hasattr(self, '_zheli_shell'):`n            shell = self._zheli_shell`n            return shell.close() if shell.isVisible() else shell.present('quick')"
+Replace-Once $ui '    def hide_to_tray(self):' "    def hide_to_tray(self):`n        if hasattr(self, '_zheli_shell'):`n            self._zheli_shell.close()"
+# Docking/fullscreen logic must not hide a panel now owned by a separate window.
+$uiText = [System.IO.File]::ReadAllText($ui)
+if ([regex]::Matches($uiText, 'self\.chat_panel\.hide\(\)').Count -ne 3) {
+    throw '固定上游聊天隐藏调用数量变化，请重新核对窗口接线'
+}
+$uiText = $uiText.Replace('self.chat_panel.hide()', "self.chat_panel.hide() if not hasattr(self, '_zheli_shell') else None")
+[System.IO.File]::WriteAllText($ui, $uiText, [System.Text.UTF8Encoding]::new($false))
 Replace-Once $ui "self._saved_theme = str(cfg.get('theme') or 'default')" "self._saved_theme = str(cfg.get('theme') or 'theme_zheli_ceramic')"
 Replace-Once $ui "str(getattr(self, '_saved_theme', 'default') or 'default')" "str(getattr(self, '_saved_theme', 'theme_zheli_ceramic') or 'theme_zheli_ceramic')"
 Replace-Once $ui '    app = QApplication(sys.argv)' "    app = QApplication(sys.argv)`n    app.setFont(QFont('PingFang SC'))"
